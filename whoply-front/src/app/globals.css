@@ -1,121 +1,227 @@
 @import "tailwindcss";
 
 /* ============================================================
-   Whoply Design System  —  premium, consistent (not copied)
-   Primary  Indigo  #4338CA
-   Accent   Amber   #F59E0B
-   Surface  Slate   #F8FAFC
+   Whoply Design System
+   Palette + typography per ../../../color.md
+   Navy #0F2B46 · Burnt orange #C25000 · Warm earth
    ============================================================ */
-:root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
 
-  --brand-50:  #eef2ff;
-  --brand-100: #e0e7ff;
-  --brand-200: #c7d2fe;
-  --brand-500: #6366f1;
-  --brand-600: #4f46e5;
-  --brand-700: #4338ca;   /* primary */
-  --brand-800: #3730a3;
+@theme {
+    /* ── Neutrals — 60-70% of the UI ───────────────────── */
+    --color-bg: #f8f9fb;
+    --color-surface: #ffffff;
+    --color-surface-2: #f3f4f6;
+    --color-border: #e5e7eb;
+    --color-text: #111827;
+    --color-muted: #6b7280;
 
-  --accent-400: #fbbf24;
-  --accent-500: #f59e0b;  /* accent */
-  --accent-600: #d97706;
+    /* ── Navy — brand weight ───────────────────────────── */
+    --color-navy: #0f2b46;
+    --color-navy-dark: #0a1f33;
+    --color-navy-light: #1b3a5f;
+    --color-navy-tint: #eef2f6;
 
-  --success-500: #10b981;
-  --success-600: #059669;
-  --danger-500:  #ef4444;
-  --warning-500: #f59e0b;
+    /* ── Warm earth — support ──────────────────────────── */
+    --color-sand: #d9c8b0;
+    --color-warm-gray: #cfc7c2;
 
-  --card-bg: #ffffff;
-  --card-border: #e8ecf3;
-  --surface-2: #f1f5f9;
-  --text-primary: #0f172a;
-  --text-secondary: #64748b;
-  --text-muted: #94a3b8;
+    /* ── Accent — primary actions ONLY ─────────────────── */
+    --color-accent: #c25000; /* white text = 4.73:1 */
+    --color-accent-hover: #a64400;
+    --color-accent-strong: #a64400; /* accent as small text */
+    --color-accent-bright: #cc5500; /* rules, icons, ≥24px only */
+    --color-accent-tint: #fff4ed;
 
-  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
-  --shadow-md: 0 6px 20px -6px rgba(30, 41, 59, 0.14);
-  --shadow-lg: 0 18px 40px -12px rgba(30, 41, 59, 0.22);
-  --radius: 16px;
+    /* ── Semantic — product states ─────────────────────── */
+    --color-success: #047857;
+    --color-success-tint: #ecfdf5;
+    --color-danger: #b42318;
+    --color-danger-tint: #fef3f2;
+    --color-warning: #b54708;
+    --color-warning-tint: #fffaeb;
+
+    /* ── Type ──────────────────────────────────────────── */
+    --font-sans:
+        var(--font-inter), var(--font-devanagari), var(--font-gujarati), ui-sans-serif, system-ui,
+        -apple-system, "Segoe UI", sans-serif;
+    --font-display:
+        var(--font-manrope), var(--font-inter), var(--font-devanagari), var(--font-gujarati),
+        ui-sans-serif, system-ui, sans-serif;
+
+    /* ── Radii ─────────────────────────────────────────── */
+    --radius-card: 16px;
+    --radius-btn: 999px;
+
+    /* ── Motion ────────────────────────────────────────── */
+    --animate-marquee: marquee 38s linear infinite;
 }
 
-.dark {
-  --background: #0b1020;
-  --foreground: #e2e8f0;
-  --card-bg: #131a2e;
-  --card-border: #232c46;
-  --surface-2: #1a2338;
-  --text-primary: #f1f5f9;
-  --text-secondary: #9aa7bd;
-  --text-muted: #6b7793;
-  --brand-700: #6366f1;
-  --shadow-md: 0 6px 22px -6px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 20px 44px -12px rgba(0, 0, 0, 0.6);
+@keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
 }
 
-* { box-sizing: border-box; }
-html, body { padding: 0; margin: 0; }
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif);
-  -webkit-font-smoothing: antialiased;
-  font-feature-settings: "tnum" 0;
+/* ============================================================
+   Base
+   ============================================================ */
+
+@layer base {
+    * {
+        box-sizing: border-box;
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        margin: 0;
+        background: var(--color-bg);
+        color: var(--color-text);
+        font-family: var(--font-sans);
+        -webkit-font-smoothing: antialiased;
+    }
+
+    /* Sticky header is 64px — keep anchored headings clear of it. */
+    section[id] {
+        scroll-margin-top: 5rem;
+    }
+
+    h1, h2, h3 {
+        font-family: var(--font-display);
+        letter-spacing: -0.02em;
+        text-wrap: balance;
+    }
+
+    /* One designed focus ring for every interactive element. */
+    a:focus-visible,
+    button:focus-visible,
+    summary:focus-visible,
+    [tabindex]:focus-visible {
+        outline: 2px solid var(--color-accent);
+        outline-offset: 3px;
+        border-radius: 4px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        html { scroll-behavior: auto; }
+        *, *::before, *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+    }
 }
 
-/* number columns / money should be tabular */
-.tabular { font-variant-numeric: tabular-nums; }
-
-/* ---- reusable primitives ---- */
-.wp-card {
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-sm);
-}
-.wp-card-hover { transition: box-shadow .2s ease, transform .2s ease; }
-.wp-card-hover:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
-
-.wp-btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
-  font-weight: 600; border-radius: 12px; padding: .6rem 1.1rem;
-  transition: all .18s ease; cursor: pointer; border: 1px solid transparent;
-  white-space: nowrap; font-size: .92rem;
-}
-.wp-btn-primary { background: var(--brand-700); color: #fff; box-shadow: var(--shadow-sm); }
-.wp-btn-primary:hover { background: var(--brand-800); box-shadow: var(--shadow-md); }
-.wp-btn-accent { background: var(--accent-500); color: #1a1205; }
-.wp-btn-accent:hover { background: var(--accent-600); color: #fff; }
-.wp-btn-ghost { background: transparent; color: var(--text-secondary); border-color: var(--card-border); }
-.wp-btn-ghost:hover { background: var(--surface-2); color: var(--text-primary); }
-.wp-btn:disabled { opacity: .55; cursor: not-allowed; }
+/* ============================================================
+   Components
+   ============================================================ */
 
 @layer components {
-  .wp-input {
-    width: 100%; background: var(--card-bg); color: var(--text-primary);
-    border: 1px solid var(--card-border); border-radius: 12px;
-    padding: .7rem .9rem; font-size: .95rem; transition: border .15s, box-shadow .15s;
-    outline: none;
-  }
+    /* Money and any figure that sits in a column. */
+    .tabular {
+        font-variant-numeric: tabular-nums;
+    }
+
+    /* Uppercase letterspaced section label — the Stratwise signature. */
+    .eyebrow {
+        display: inline-block;
+        font-size: 0.6875rem;
+        font-weight: 600;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--color-muted);
+    }
+    .eyebrow-on-navy {
+        color: var(--color-sand);
+    }
+
+    /* ── Buttons — pill, per the reference ─────────────── */
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        border-radius: var(--radius-btn);
+        border: 1px solid transparent;
+        padding: 0.875rem 1.65rem;
+        font-size: 0.9375rem;
+        font-weight: 600;
+        line-height: 1.25;
+        white-space: nowrap;
+        cursor: pointer;
+        transition: background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease,
+            transform 0.18s ease;
+    }
+    .btn:active {
+        transform: translateY(1px);
+    }
+
+    .btn-primary {
+        background: var(--color-accent);
+        color: #fff;
+    }
+    .btn-primary:hover {
+        background: var(--color-accent-hover);
+    }
+
+    .btn-secondary {
+        background: var(--color-surface);
+        color: var(--color-navy);
+        border-color: var(--color-navy);
+    }
+    .btn-secondary:hover {
+        background: var(--color-surface-2);
+    }
+
+    .btn-on-navy {
+        background: #fff;
+        color: var(--color-navy);
+    }
+    .btn-on-navy:hover {
+        background: var(--color-sand);
+    }
+
+    .btn-ghost-navy {
+        background: transparent;
+        color: #fff;
+        border-color: rgb(255 255 255 / 0.35);
+    }
+    .btn-ghost-navy:hover {
+        background: rgb(255 255 255 / 0.1);
+        border-color: rgb(255 255 255 / 0.6);
+    }
+
+    /* ── Surfaces ──────────────────────────────────────── */
+    .card {
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-card);
+    }
+    .card-hover {
+        transition: box-shadow 0.2s ease, transform 0.2s ease;
+    }
+    .card-hover:hover {
+        box-shadow: 0 6px 20px -6px rgb(15 43 70 / 0.14);
+        transform: translateY(-2px);
+    }
+
+    .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        border-radius: 999px;
+        padding: 0.25rem 0.7rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        line-height: 1.4;
+    }
+
+    /* Soft radial wash behind the hero — built, not borrowed. */
+    .hero-wash {
+        background:
+            radial-gradient(760px 460px at 50% -12%, rgb(217 200 176 / 0.55), transparent 68%),
+            radial-gradient(620px 420px at 88% 4%, rgb(194 80 0 / 0.09), transparent 62%),
+            radial-gradient(680px 460px at 8% 12%, rgb(15 43 70 / 0.07), transparent 62%);
+    }
 }
-.wp-input:focus { border-color: var(--brand-600); box-shadow: 0 0 0 3px var(--brand-100); }
-.dark .wp-input:focus { box-shadow: 0 0 0 3px rgba(79,70,229,.25); }
-
-.wp-chip {
-  display: inline-flex; align-items: center; gap: .35rem;
-  font-size: .72rem; font-weight: 600; padding: .2rem .6rem; border-radius: 999px;
-}
-
-.wp-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
-.wp-scroll::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 8px; }
-
-/* subtle brand gradient used on auth + hero */
-.wp-gradient {
-  background:
-    radial-gradient(1100px 500px at 10% -10%, rgba(67,56,202,.16), transparent 60%),
-    radial-gradient(900px 500px at 100% 0%, rgba(245,158,11,.12), transparent 55%);
-}
-
-@keyframes wp-fade-up { from { opacity: 0; transform: translateY(8px);} to { opacity: 1; transform: none; } }
-.wp-fade-up { animation: wp-fade-up .4s ease both; }

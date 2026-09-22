@@ -4,62 +4,96 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { cn } from '@/lib/cn';
 
 /**
- * Scroll-reveal that never ships hidden content.
+ * 'static' — on screen at hydration (or no JS): render normally, never animate.
+ * 'hidden' — below the fold at mount: armed, waiting to scroll into view.
+ * 'shown'  — scrolled into view: play the entrance.
  *
- * The server render and first paint are fully visible — nothing is `opacity: 0`
- * in the SSR HTML, so the page still reads with JS disabled or hydration failed.
- * Only elements that are genuinely below the fold at mount get armed for the
- * fade-up; anything already on screen is marked shown and never animates.
+ * The server render is always 'static', so nothing ships hidden in the HTML and
+ * the page still reads with JS disabled or hydration failed.
  */
-export function Reveal({
-    children,
-    delay = 0,
-    className,
-}: {
-    children: ReactNode;
-    delay?: number;
-    className?: string;
-}) {
-    const ref = useRef<HTMLDivElement>(null);
-    const [armed, setArmed] = useState(false);
-    const [shown, setShown] = useState(false);
+export type RevealState = 'static' | 'hidden' | 'shown';
+
+export function useReveal<T extends Element>(threshold = 0.15) {
+    const ref = useRef<T>(null);
+    const [state, setState] = useState<RevealState>('static');
 
     useEffect(() => {
         const el = ref.current;
         if (!el) return;
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        if (el.getBoundingClientRect().top < window.innerHeight * 0.9) return;
 
-        // Already visible at hydration → leave it alone, no flash.
-        if (el.getBoundingClientRect().top < window.innerHeight * 0.9) {
-            setShown(true);
-            return;
-        }
-
-        setArmed(true);
+        setState('hidden');
         const io = new IntersectionObserver(
             ([entry]) => {
                 if (entry.isIntersecting) {
-                    setShown(true);
+                    setState('shown');
                     io.disconnect();
                 }
             },
-            { threshold: 0.12 }
+            { threshold, rootMargin: '0px 0px -8% 0px' }
         );
         io.observe(el);
         return () => io.disconnect();
-    }, []);
+    }, [threshold]);
 
-    const hidden = armed && !shown;
+    return [ref, state] as const;
+}
+
+type Variant = 'up' | 'left' | 'right' | 'zoom' | 'wipe';
+
+const HIDDEN: Record<Variant, string> = {
+    up: 'translate-y-12 opacity-0',
+    left: '-translate-x-14 opacity-0',
+    right: 'translate-x-14 opacity-0',
+    zoom: 'scale-[0.88] opacity-0',
+    // Curtain from the bottom edge — for photos.
+    wipe: '[clip-path:inset(100%_0_0_0_round_16px)]',
+};
+
+const SHOWN: Record<Variant, string> = {
+    up: 'translate-y-0 opacity-100',
+    left: 'translate-x-0 opacity-100',
+    right: 'translate-x-0 opacity-100',
+    zoom: 'scale-100 opacity-100',
+    wipe: '[clip-path:inset(0_0_0_0_round_16px)]',
+};
+
+export function Reveal({
+    children,
+    delay = 0,
+    variant = 'up',
+    className,
+}: {
+    children: ReactNode;
+    delay?: number;
+    variant?: Variant;
+    className?: string;
+}) {
+    const [ref, state] = useReveal<HTMLDivElement>();
+
+    const motionClass = cn(
+        // Transition only on the way in — arming (static → hidden) must be instant.
+        state === 'shown' &&
+            'transition-[opacity,transform,clip-path] duration-[1000ms] ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none',
+        state === 'static' ? '' : state === 'hidden' ? HIDDEN[variant] : SHOWN[variant]
+    );
+    const style = state === 'shown' ? { transitionDelay: `${delay}ms` } : undefined;
+
+    // A fully clip-pathed element counts as not intersecting, so the observer
+    // would never fire — watch an unclipped wrapper and clip the inner layer.
+    if (variant === 'wipe') {
+        return (
+            <div ref={ref} className={className}>
+                <div className={motionClass} style={style}>
+                    {children}
+                </div>
+            </div>
+        );
+    }
 
     return (
-        <div
-            ref={ref}
-            className={cn(
-                'transition-[opacity,transform] duration-700 ease-out motion-reduce:transition-none',
-                hidden ? 'translate-y-3 opacity-0' : 'translate-y-0 opacity-100',
-                className
-            )}
-            style={hidden ? undefined : { transitionDelay: `${delay}ms` }}
-        >
+        <div ref={ref} className={cn(motionClass, className)} style={style}>
             {children}
         </div>
     );

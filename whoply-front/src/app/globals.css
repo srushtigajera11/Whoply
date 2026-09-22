@@ -61,6 +61,125 @@
     to { transform: translateX(-50%); }
 }
 
+@keyframes rise {
+    from { opacity: 0; transform: translateY(0.35em); }
+    to { opacity: 1; transform: none; }
+}
+
+@keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Transform only — the hero photo is the LCP element, so it must never start hidden. */
+@keyframes settle {
+    from { transform: scale(1.06); }
+    to { transform: scale(1); }
+}
+
+@keyframes live-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgb(4 120 87 / 0.5); }
+    70% { box-shadow: 0 0 0 5px rgb(4 120 87 / 0); }
+}
+
+/* ── Bento loops ──────────────────────────────────────────
+   Every element's resting style is its "finished" look; the keyframes only
+   take it away and bring it back. So with animations off (reduced motion,
+   paused, or unsupported) each tile still shows a complete picture. */
+@keyframes bento-line {
+    0%, 6% { opacity: 0; transform: translateY(6px); }
+    14%, 86% { opacity: 1; transform: none; }
+    94%, 100% { opacity: 0; transform: translateY(-4px); }
+}
+@keyframes bento-stamp {
+    0%, 32% { opacity: 0; transform: scale(1.7) rotate(-12deg); }
+    40% { opacity: 1; transform: scale(0.94) rotate(-12deg); }
+    45%, 86% { opacity: 1; transform: scale(1) rotate(-12deg); }
+    94%, 100% { opacity: 0; transform: scale(1) rotate(-12deg); }
+}
+@keyframes bento-drain {
+    0%, 100% { transform: scaleX(1); background-color: var(--color-success); }
+    35% { background-color: var(--color-warning); }
+    50% { transform: scaleX(0.12); background-color: var(--color-danger); }
+    65% { background-color: var(--color-warning); }
+}
+@keyframes bento-ring {
+    0%, 60%, 100% { transform: rotate(0); }
+    64% { transform: rotate(16deg); }
+    68% { transform: rotate(-14deg); }
+    72% { transform: rotate(9deg); }
+    76% { transform: rotate(-5deg); }
+    80% { transform: rotate(0); }
+}
+@keyframes bento-sent {
+    0%, 20% { opacity: 0; transform: scale(0.4); }
+    28%, 88% { opacity: 1; transform: scale(1); }
+    96%, 100% { opacity: 0; transform: scale(1); }
+}
+/* The rail is the full track width, so translateX(100%) is the whole route. */
+@keyframes bento-rail {
+    0%, 8% { transform: translateX(0); }
+    78%, 100% { transform: translateX(calc(100% - 1.75rem)); }
+}
+@keyframes bento-progress {
+    0%, 8% { transform: scaleX(0); }
+    78%, 100% { transform: scaleX(1); }
+}
+@keyframes bento-draw {
+    0% { stroke-dashoffset: 1; opacity: 1; }
+    45%, 86% { stroke-dashoffset: 0; opacity: 1; }
+    100% { stroke-dashoffset: 0; opacity: 0; }
+}
+@keyframes bento-grow {
+    0% { transform: scaleY(0.08); }
+    35%, 86% { transform: scaleY(1); }
+    100% { transform: scaleY(0.08); }
+}
+@keyframes bento-pop {
+    0%, 30%, 100% { transform: none; }
+    8% { transform: translateY(-8px) scale(1.12); }
+    16% { transform: none; }
+}
+
+/* Quick sweep in the first quarter, then rest for the remainder of the cycle. */
+@keyframes shine {
+    0% { transform: translateX(-120%) skewX(-20deg); }
+    25%, 100% { transform: translateX(260%) skewX(-20deg); }
+}
+
+/* ── Hero stage ───────────────────────────────────────── */
+@keyframes pop-in {
+    from { opacity: 0; transform: translateY(18px) scale(0.94); }
+}
+@keyframes float-y {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-9px); }
+}
+@keyframes orbit {
+    to { transform: rotate(360deg); }
+}
+/* Transform only — like the old hero photo, the cutout must never start hidden. */
+@keyframes cutout-rise {
+    from { transform: translateY(26px); }
+}
+
+/* ── Hotspots ─────────────────────────────────────────── */
+@keyframes spot-ping {
+    0% { transform: scale(1); opacity: 0.55; }
+    80%, 100% { transform: scale(2.6); opacity: 0; }
+}
+@keyframes spot-progress {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+}
+
+/* Registered so the spotlight can glide between hotspots — unregistered custom
+   properties swap instantly. Browsers without @property simply jump. */
+@property --spot-x { syntax: "<percentage>"; inherits: true; initial-value: 50%; }
+@property --spot-y { syntax: "<percentage>"; inherits: true; initial-value: 50%; }
+@property --spot-w { syntax: "<percentage>"; inherits: true; initial-value: 200%; }
+@property --spot-h { syntax: "<percentage>"; inherits: true; initial-value: 200%; }
+
 /* ============================================================
    Base
    ============================================================ */
@@ -80,6 +199,8 @@
         color: var(--color-text);
         font-family: var(--font-sans);
         -webkit-font-smoothing: antialiased;
+        /* Side-sliding reveals start off-canvas; `clip` (unlike `hidden`) keeps sticky working. */
+        overflow-x: clip;
     }
 
     /* Sticky header is 64px — keep anchored headings clear of it. */
@@ -215,6 +336,139 @@
         font-size: 0.75rem;
         font-weight: 600;
         line-height: 1.4;
+    }
+
+    /* ── Hero motion ───────────────────────────────────── */
+    .word-rise {
+        display: inline-block;
+        animation: rise 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    }
+    .fade-in {
+        animation: fade-in 0.5s ease-out both;
+    }
+    .hero-settle {
+        animation: settle 1.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    }
+    .live-dot {
+        animation: live-pulse 2s ease-out infinite;
+    }
+
+    /* A light sweep across the primary CTA every few seconds. */
+    .btn-shine {
+        position: relative;
+        overflow: hidden;
+        isolation: isolate;
+    }
+    .btn-shine::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        width: 40%;
+        z-index: -1;
+        background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.28), transparent);
+        animation: shine 4.5s ease-in-out 1.5s infinite both;
+        pointer-events: none;
+    }
+
+    /* The global override shortens durations but keeps delays, which would leave
+       staggered words invisible for a beat — switch these off outright. */
+    @media (prefers-reduced-motion: reduce) {
+        .word-rise, .fade-in, .hero-settle, .live-dot, .btn-shine::after {
+            animation: none;
+        }
+    }
+
+    /* ── Bento ─────────────────────────────────────────── */
+    .bento-line { animation: bento-line 6s ease-in-out infinite both; }
+    .bento-stamp { transform: rotate(-12deg); animation: bento-stamp 6s ease-out infinite both; }
+    .bento-drain { animation: bento-drain 6s ease-in-out infinite; }
+    .bento-ring { transform-origin: 50% 10%; animation: bento-ring 3.2s ease-in-out infinite; }
+    .bento-sent { animation: bento-sent 5s ease-out infinite both; }
+    .bento-rail { animation: bento-rail 4.5s cubic-bezier(0.6, 0, 0.3, 1) infinite; }
+    .bento-progress { animation: bento-progress 4.5s cubic-bezier(0.6, 0, 0.3, 1) infinite; }
+    .bento-draw { stroke-dasharray: 1; animation: bento-draw 5s ease-out infinite; }
+    .bento-grow { animation: bento-grow 5s cubic-bezier(0.2, 0.7, 0.2, 1) infinite both; }
+    .bento-pop { animation: bento-pop 3.5s ease-out infinite; }
+
+    .bento-paused * { animation-play-state: paused !important; }
+
+    @media (prefers-reduced-motion: reduce) {
+        .bento * { animation: none !important; }
+    }
+
+    /* Cursor-following glow on bento tiles (--mx/--my set on pointermove). */
+    .spotlight::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), rgb(194 80 0 / 0.09), transparent 45%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+    }
+    .spotlight-dark::before {
+        background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), rgb(217 200 176 / 0.16), transparent 45%);
+    }
+    .spotlight:hover::before { opacity: 1; }
+
+    /* Glare that follows the cursor across a <Tilt> card — drawn above the card. */
+    .glare::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        border-radius: inherit;
+        background: radial-gradient(360px circle at var(--mx, 50%) var(--my, 50%), rgb(194 80 0 / 0.08), transparent 50%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+    }
+    .glare:hover::after { opacity: 1; }
+
+    /* ── Hero stage ────────────────────────────────────── */
+    .pop-in { animation: pop-in 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+    .float-y { animation: float-y 7s ease-in-out infinite; }
+    .orbit { animation: orbit 70s linear infinite; }
+    .cutout-rise { animation: cutout-rise 1.3s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+
+    /* The dome the shopkeeper stands in front of. */
+    .hero-dome {
+        background:
+            radial-gradient(circle at 50% 28%, rgb(217 200 176 / 0.28), transparent 42%),
+            radial-gradient(circle at 50% 30%, var(--color-navy-light), var(--color-navy) 66%);
+        box-shadow: 0 -40px 90px -30px rgb(15 43 70 / 0.45);
+    }
+
+    /* Dot grid behind the hero, fading out from the stage. */
+    .hero-dots {
+        background-image: radial-gradient(rgb(15 43 70 / 0.14) 1px, transparent 1.3px);
+        background-size: 22px 22px;
+        -webkit-mask-image: radial-gradient(ellipse 60% 70% at 72% 45%, #000 20%, transparent 72%);
+        mask-image: radial-gradient(ellipse 60% 70% at 72% 45%, #000 20%, transparent 72%);
+    }
+
+    /* ── Hotspots ──────────────────────────────────────── */
+    /* The stage carries the focus point as custom properties; the image inside
+       fades everything outside that ellipse toward the background. */
+    .spot-stage {
+        transition:
+            --spot-x 0.8s cubic-bezier(0.65, 0, 0.35, 1),
+            --spot-y 0.8s cubic-bezier(0.65, 0, 0.35, 1),
+            --spot-w 0.8s cubic-bezier(0.65, 0, 0.35, 1),
+            --spot-h 0.8s cubic-bezier(0.65, 0, 0.35, 1);
+    }
+    .spot-mask {
+        -webkit-mask-image: radial-gradient(var(--spot-w) var(--spot-h) at var(--spot-x) var(--spot-y), #000 70%, rgb(0 0 0 / var(--spot-dim, 0.3)) 100%);
+        mask-image: radial-gradient(var(--spot-w) var(--spot-h) at var(--spot-x) var(--spot-y), #000 70%, rgb(0 0 0 / var(--spot-dim, 0.3)) 100%);
+    }
+    .spot-ping { animation: spot-ping 2.2s cubic-bezier(0, 0, 0.2, 1) infinite; }
+    .spot-progress { transform-origin: left; animation: spot-progress linear both; }
+
+    @media (prefers-reduced-motion: reduce) {
+        .pop-in, .float-y, .orbit, .cutout-rise, .spot-ping, .spot-progress {
+            animation: none;
+        }
     }
 
     /* Soft radial wash behind the hero — built, not borrowed. */

@@ -8,7 +8,12 @@
  * `public/img/unused/` holds four stock images that were supplied but not
  * wired in: three use a cyan/neon treatment that fights the navy + burnt-orange
  * palette, and one is a boardroom handshake — wrong audience for kirana
- * shopkeepers. They're kept, not deleted.
+ * shopkeepers. They're kept, not deleted. `E-COMMERCE.jfif` joined them: a
+ * 626px-wide dark neon render — too small to show sharp and off-palette.
+ *
+ * `public/img/assets/` PNGs carry alpha. The shopkeeper, dashboard and counter
+ * kit are cutouts and sit on any background; the store photo's edges fade out
+ * unevenly, so it must sit on navy, which that fade dissolves into.
  */
 
 export interface Media {
@@ -20,6 +25,46 @@ export interface Media {
 }
 
 export const MEDIA = {
+    heroCutout: {
+        src: '/img/assets/shopkeeper.png',
+        width: 1143,
+        height: 1376,
+        alt: {
+            en: 'A smiling shopkeeper in an apron pointing at a tablet that shows today’s sales and low-stock items.',
+            hi: 'एप्रन पहने मुस्कुराता दुकानदार, टैबलेट की ओर इशारा करते हुए जिसमें आज की बिक्री और कम स्टॉक दिख रहा है।',
+            gu: 'એપ્રન પહેરેલો હસતો દુકાનદાર, ટેબ્લેટ તરફ ઇશારો કરતો જેમાં આજનું વેચાણ અને ઓછો સ્ટોક દેખાય છે.',
+        },
+    },
+    dashboard: {
+        src: '/img/assets/dashboard.png',
+        width: 1536,
+        height: 1024,
+        alt: {
+            en: 'A tablet showing a shop dashboard: sales chart, top-selling products, recent orders, low-stock alerts and expenses.',
+            hi: 'दुकान का डैशबोर्ड दिखाता टैबलेट: बिक्री चार्ट, सबसे ज़्यादा बिकने वाला माल, हाल के ऑर्डर, कम स्टॉक अलर्ट और खर्च।',
+            gu: 'દુકાનનું ડેશબોર્ડ બતાવતું ટેબ્લેટ: વેચાણ ચાર્ટ, સૌથી વધુ વેચાતો માલ, તાજેતરના ઓર્ડર, ઓછા સ્ટોકની ચેતવણી અને ખર્ચ.',
+        },
+    },
+    counterKit: {
+        src: '/img/assets/wigets.png',
+        width: 1536,
+        height: 1024,
+        alt: {
+            en: 'Counter essentials laid out: a billing tablet, a thermal receipt printer, a barcode scanner and a UPI scan-and-pay stand.',
+            hi: 'काउंटर का सामान: बिलिंग टैबलेट, थर्मल रसीद प्रिंटर, बारकोड स्कैनर और UPI स्कैन-एंड-पे स्टैंड।',
+            gu: 'કાઉન્ટરનો સામાન: બિલિંગ ટેબ્લેટ, થર્મલ રસીદ પ્રિન્ટર, બારકોડ સ્કેનર અને UPI સ્કેન-એન્ડ-પે સ્ટેન્ડ.',
+        },
+    },
+    storeCounter: {
+        src: '/img/assets/store.png',
+        width: 1536,
+        height: 1024,
+        alt: {
+            en: 'A tidy neighbourhood shop counter with a billing screen and receipt printer, stocked shelves behind.',
+            hi: 'साफ़-सुथरा मोहल्ले की दुकान का काउंटर, बिलिंग स्क्रीन और रसीद प्रिंटर के साथ, पीछे भरी हुई रैक।',
+            gu: 'સ્વચ્છ મહોલ્લાની દુકાનનું કાઉન્ટર, બિલિંગ સ્ક્રીન અને રસીદ પ્રિન્ટર સાથે, પાછળ ભરેલી રેક.',
+        },
+    },
     heroShopkeeper: {
         src: '/img/shopkeeper-phone-hero.png',
         width: 1536,

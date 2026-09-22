@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { motion, useScroll, useSpring } from 'framer-motion';
 import { Menu, X, ArrowRight } from 'lucide-react';
 import { Logo } from './Logo';
 import { getCopy, pathFor, LANGS, LANG_LABEL, HREF_LANG, type Lang } from '@/i18n/landing';
-
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:7200';
+import { appEntry } from '@/lib/links';
 
 /** EN · हिं · ગુ — each is a real link to that locale's own page. */
 function LangSwitch({ lang, full = false }: { lang: Lang; full?: boolean }) {
@@ -34,7 +34,19 @@ function LangSwitch({ lang, full = false }: { lang: Lang; full?: boolean }) {
 
 export function Nav({ lang }: { lang: Lang }) {
     const [open, setOpen] = useState(false);
+    const [scrolled, setScrolled] = useState(false);
     const t = getCopy(lang);
+
+    // Reading progress along the header's bottom edge.
+    const { scrollYProgress } = useScroll();
+    const progress = useSpring(scrollYProgress, { stiffness: 200, damping: 30, restDelta: 0.001 });
+
+    useEffect(() => {
+        const onScroll = () => setScrolled(window.scrollY > 40);
+        onScroll();
+        window.addEventListener('scroll', onScroll, { passive: true });
+        return () => window.removeEventListener('scroll', onScroll);
+    }, []);
 
     return (
         <>
@@ -43,7 +55,20 @@ export function Nav({ lang }: { lang: Lang }) {
                 {t.nav.announcement}
             </div>
 
-            <header className="sticky top-0 z-50 bg-navy">
+            {/* Solid at the top; frosted once the page moves underneath it. Colour
+                only — the height never changes, so nothing below shifts. */}
+            <header
+                className={`sticky top-0 z-50 transition-[background-color,box-shadow] duration-300 ${
+                    scrolled
+                        ? 'bg-navy/80 shadow-[0_10px_30px_-12px_rgb(10,31,51,0.6)] backdrop-blur-md'
+                        : 'bg-navy'
+                }`}
+            >
+                <motion.div
+                    aria-hidden="true"
+                    style={{ scaleX: progress }}
+                    className="absolute inset-x-0 bottom-0 h-0.5 origin-left bg-accent-bright"
+                />
                 <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between px-5">
                     <a href={pathFor(lang)} aria-label={t.nav.home}>
                         <Logo size={30} onNavy />
@@ -65,10 +90,10 @@ export function Nav({ lang }: { lang: Lang }) {
 
                     <div className="hidden items-center gap-4 lg:flex">
                         <LangSwitch lang={lang} />
-                        <a href={`${APP_URL}/login`} className="text-sm font-semibold text-white">
+                        <a href={appEntry(lang)} className="text-sm font-semibold text-white">
                             {t.nav.login}
                         </a>
-                        <a href={`${APP_URL}/login`} className="btn btn-primary !px-5 !py-2.5 text-sm">
+                        <a href={appEntry(lang)} className="btn btn-primary !px-5 !py-2.5 text-sm">
                             {t.nav.start} <ArrowRight size={16} aria-hidden="true" />
                         </a>
                     </div>
@@ -102,14 +127,14 @@ export function Nav({ lang }: { lang: Lang }) {
                         <div className="mt-4 flex flex-col gap-3">
                             <LangSwitch lang={lang} full />
                             <a
-                                href={`${APP_URL}/login`}
+                                href={appEntry(lang)}
                                 className="btn btn-ghost-navy w-full"
                                 onClick={() => setOpen(false)}
                             >
                                 {t.nav.login}
                             </a>
                             <a
-                                href={`${APP_URL}/login`}
+                                href={appEntry(lang)}
                                 className="btn btn-primary w-full"
                                 onClick={() => setOpen(false)}
                             >

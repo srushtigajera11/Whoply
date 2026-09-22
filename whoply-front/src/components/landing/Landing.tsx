@@ -3,7 +3,6 @@ import {
     ArrowRight,
     BadgeCheck,
     BarChart3,
-    Boxes,
     CalendarClock,
     Check,
     ClipboardList,
@@ -18,7 +17,6 @@ import {
     Smartphone,
     Sunrise,
     Truck,
-    Users,
     Wallet,
 } from 'lucide-react';
 import { Nav } from '@/components/Nav';
@@ -29,8 +27,15 @@ import { Faq } from '@/components/landing/Faq';
 import { Reveal } from '@/components/landing/Reveal';
 import { getCopy, HREF_LANG, type Lang } from '@/i18n/landing';
 import { MEDIA } from '@/lib/media';
+import { appEntry } from '@/lib/links';
+import { StickyCta } from '@/components/landing/StickyCta';
+import { Bento } from '@/components/landing/Bento';
+import { Timeline } from '@/components/landing/Timeline';
+import { CountUp, Parallax, ParallaxFrame, Tilt } from '@/components/landing/Motion';
+import { CounterKit } from '@/components/landing/CounterKit';
+import { DashboardShowcase } from '@/components/landing/DashboardShowcase';
+import { FinalCta } from '@/components/landing/FinalCta';
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:7200';
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000/api';
 
 interface Plan {
@@ -119,7 +124,7 @@ function SectionHead({
     align?: 'center' | 'left';
 }) {
     return (
-        <div className={align === 'center' ? 'mx-auto max-w-2xl text-center' : 'max-w-2xl'}>
+        <Reveal className={align === 'center' ? 'mx-auto max-w-2xl text-center' : 'max-w-2xl'}>
             <span className={`eyebrow ${onNavy ? 'eyebrow-on-navy' : ''}`}>{eyebrow}</span>
             <h2
                 className={`mt-3 font-display text-3xl font-extrabold sm:text-[2.5rem] sm:leading-[1.15] ${
@@ -129,17 +134,19 @@ function SectionHead({
                 {title}
             </h2>
             {sub && <p className={`mt-4 text-lg leading-relaxed ${onNavy ? 'text-white/70' : 'text-muted'}`}>{sub}</p>}
-        </div>
+        </Reveal>
     );
 }
 
 function Bullets({ items }: { items: string[] }) {
     return (
         <ul className="mt-6 space-y-3">
-            {items.map((t) => (
-                <li key={t} className="flex gap-3">
-                    <Check size={18} aria-hidden="true" className="mt-0.5 shrink-0 text-success" />
-                    <span className="text-[0.95rem] leading-relaxed text-muted">{t}</span>
+            {items.map((t, i) => (
+                <li key={t}>
+                    <Reveal variant="left" delay={i * 70} className="flex gap-3">
+                        <Check size={18} aria-hidden="true" className="mt-0.5 shrink-0 text-success" />
+                        <span className="text-[0.95rem] leading-relaxed text-muted">{t}</span>
+                    </Reveal>
                 </li>
             ))}
         </ul>
@@ -163,9 +170,7 @@ export async function Landing({ lang }: { lang: Lang }) {
     const problemIcons = [Wallet, CalendarClock, Receipt, BarChart3];
     const complianceIcons = [FileText, Truck, ScrollText, FileSpreadsheet];
     const shopStatIcons = [Receipt, Package, Wallet, BarChart3];
-    const featureIcons = [Receipt, Boxes, Wallet, Truck, BarChart3, Users];
     const automationIcons = [Moon, Sunrise, ClipboardList];
-    const tourImages = [MEDIA.phoneDashboard, MEDIA.phoneLedger, MEDIA.dispatchTruck, MEDIA.packedInventory];
     const installIcons = [Smartphone, BadgeCheck, RotateCcw];
     const timelineTones = ['success', 'success', 'success', 'warning', 'danger'] as const;
 
@@ -179,23 +184,26 @@ export async function Landing({ lang }: { lang: Lang }) {
                 {/* ── Problem ─────────────────────────────── */}
                 <Section id="problem">
                     <div className="grid items-center gap-12 lg:grid-cols-[0.9fr_1.1fr]">
-                        <Reveal>
-                            {/* Photo + floating badge — the reference's "who we are" pattern. */}
+                        <Reveal variant="left">
+                            {/* Photo + floating badge — the badge drifts at its own speed for depth. */}
                             <div className="relative">
-                                <Image
-                                    src={MEDIA.paperLedger.src}
-                                    alt={MEDIA.paperLedger.alt[lang]}
-                                    width={MEDIA.paperLedger.width}
-                                    height={MEDIA.paperLedger.height}
-                                    sizes="(max-width: 1024px) 100vw, 520px"
-                                    className="aspect-[4/3] w-full rounded-2xl border border-border object-cover"
-                                />
-                                <div className="card absolute -right-3 -bottom-6 max-w-[15rem] p-4 shadow-[0_18px_40px_-18px_rgb(15,43,70,0.35)] sm:-right-6">
-                                    <p className="text-xs text-muted">{t.hero.mock.retailTiles[3][0]}</p>
-                                    <p className="tabular font-display text-2xl font-extrabold text-danger">
-                                        {t.hero.mock.retailTiles[3][1]}
-                                    </p>
-                                </div>
+                                <ParallaxFrame className="aspect-[4/3] w-full rounded-2xl border border-border">
+                                    <Image
+                                        src={MEDIA.paperLedger.src}
+                                        alt={MEDIA.paperLedger.alt[lang]}
+                                        width={MEDIA.paperLedger.width}
+                                        height={MEDIA.paperLedger.height}
+                                        sizes="(max-width: 1024px) 100vw, 520px"
+                                    />
+                                </ParallaxFrame>
+                                <Parallax amount={36} className="absolute -right-3 -bottom-6 z-10 sm:-right-6">
+                                    <div className="card max-w-[15rem] p-4 shadow-[0_18px_40px_-18px_rgb(15,43,70,0.35)]">
+                                        <p className="text-xs text-muted">{t.hero.mock.retailTiles[3][0]}</p>
+                                        <p className="tabular font-display text-2xl font-extrabold text-danger">
+                                            <CountUp value={t.hero.mock.retailTiles[3][1]} onView />
+                                        </p>
+                                    </div>
+                                </Parallax>
                             </div>
                         </Reveal>
                         <SectionHead align="left" eyebrow={t.problem.eyebrow} title={t.problem.title} />
@@ -205,14 +213,16 @@ export async function Landing({ lang }: { lang: Lang }) {
                         {t.problem.cards.map((p, i) => {
                             const Icon = problemIcons[i];
                             return (
-                                <Reveal key={p.title} delay={i * 60}>
-                                    <div className="card card-hover h-full p-7">
-                                        <div className="grid h-11 w-11 place-items-center rounded-xl bg-navy-tint text-navy">
-                                            <Icon size={20} aria-hidden="true" />
+                                <Reveal key={p.title} variant={i % 2 ? 'right' : 'left'} delay={i * 90} className="h-full">
+                                    <Tilt className="h-full rounded-2xl">
+                                        <div className="card card-hover h-full p-7">
+                                            <div className="grid h-11 w-11 place-items-center rounded-xl bg-navy-tint text-navy">
+                                                <Icon size={20} aria-hidden="true" />
+                                            </div>
+                                            <h3 className="mt-5 font-display text-lg font-bold text-navy">{p.title}</h3>
+                                            <p className="mt-2 text-[0.95rem] leading-relaxed text-muted">{p.body}</p>
                                         </div>
-                                        <h3 className="mt-5 font-display text-lg font-bold text-navy">{p.title}</h3>
-                                        <p className="mt-2 text-[0.95rem] leading-relaxed text-muted">{p.body}</p>
-                                    </div>
+                                    </Tilt>
                                 </Reveal>
                             );
                         })}
@@ -231,8 +241,8 @@ export async function Landing({ lang }: { lang: Lang }) {
                         {t.compliance.cards.map((f, i) => {
                             const Icon = complianceIcons[i];
                             return (
-                                <Reveal key={f.title} delay={i * 60}>
-                                    <div className="h-full rounded-2xl border border-white/12 bg-white/[0.06] p-7">
+                                <Reveal key={f.title} variant="zoom" delay={i * 110} className="h-full">
+                                    <div className="h-full rounded-2xl border border-white/12 bg-white/[0.06] p-7 transition-colors duration-300 hover:border-sand/40 hover:bg-white/[0.1]">
                                         <div className="grid h-11 w-11 place-items-center rounded-xl bg-sand text-navy">
                                             <Icon size={20} aria-hidden="true" />
                                         </div>
@@ -257,70 +267,56 @@ export async function Landing({ lang }: { lang: Lang }) {
                                 sub={t.shopkeepers.sub}
                             />
                             <Bullets items={t.shopkeepers.bullets} />
-                            <a href={`${APP_URL}/login`} className="btn btn-primary mt-8">
+                            <a href={appEntry(lang, 'retail')} className="btn btn-primary mt-8">
                                 {t.shopkeepers.cta} <ArrowRight size={17} aria-hidden="true" />
                             </a>
                         </div>
-                        <Reveal>
-                            <Image
-                                src={MEDIA.posPrinter.src}
-                                alt={MEDIA.posPrinter.alt[lang]}
-                                width={MEDIA.posPrinter.width}
-                                height={MEDIA.posPrinter.height}
-                                sizes="(max-width: 1024px) 100vw, 560px"
-                                className="aspect-[3/2] w-full rounded-2xl border border-border object-cover"
-                            />
+                        <div>
+                            <Reveal variant="zoom">
+                                <CounterKit lang={lang} />
+                            </Reveal>
                             <div className="mt-4 grid grid-cols-2 gap-4">
                                 {t.shopkeepers.stats.map(([k, v], i) => {
                                     const Icon = shopStatIcons[i];
                                     return (
-                                        <div key={k} className="card p-5">
-                                            <Icon size={18} className="text-accent-strong" aria-hidden="true" />
-                                            <p className="mt-3 text-xs text-muted">{k}</p>
-                                            <p className="font-display text-lg font-extrabold text-navy">{v}</p>
-                                        </div>
+                                        <Reveal key={k} variant="zoom" delay={150 + i * 100} className="h-full">
+                                            <div className="card card-hover h-full p-5">
+                                                <Icon size={18} className="text-accent-strong" aria-hidden="true" />
+                                                <p className="mt-3 text-xs text-muted">{k}</p>
+                                                <p className="font-display text-lg font-extrabold text-navy">
+                                                    <CountUp value={v} onView />
+                                                </p>
+                                            </div>
+                                        </Reveal>
                                     );
                                 })}
                             </div>
-                        </Reveal>
+                        </div>
                     </div>
                 </Section>
 
                 {/* ── For wholesalers ─────────────────────── */}
                 <Section id="wholesalers" className="bg-navy-tint">
                     <div className="grid items-center gap-14 lg:grid-cols-2">
-                        <Reveal className="order-2 lg:order-1">
-                            <Image
-                                src={MEDIA.warehouse.src}
-                                alt={MEDIA.warehouse.alt[lang]}
-                                width={MEDIA.warehouse.width}
-                                height={MEDIA.warehouse.height}
-                                sizes="(max-width: 1024px) 100vw, 560px"
-                                className="aspect-[3/2] w-full rounded-2xl border border-border object-cover"
-                            />
-                            <div className="card -mt-10 ml-auto mr-0 w-[92%] p-6 shadow-[0_18px_40px_-18px_rgb(15,43,70,0.3)]">
-                                <p className="eyebrow">{t.wholesalers.timelineLabel}</p>
-                                <ol className="mt-5 space-y-4">
-                                    {t.wholesalers.timeline.map(([title, sub], i) => (
-                                        <li key={title} className="flex items-start gap-3">
-                                            <span
-                                                className={`mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full ${
-                                                    timelineTones[i] === 'success'
-                                                        ? 'bg-success'
-                                                        : timelineTones[i] === 'warning'
-                                                          ? 'bg-warning'
-                                                          : 'bg-danger'
-                                                }`}
-                                            />
-                                            <div>
-                                                <p className="text-sm font-semibold text-navy">{title}</p>
-                                                <p className="tabular text-xs text-muted">{sub}</p>
-                                            </div>
-                                        </li>
-                                    ))}
-                                </ol>
-                            </div>
-                        </Reveal>
+                        <div className="order-2 lg:order-1">
+                            <Reveal variant="wipe">
+                                <ParallaxFrame className="aspect-[3/2] w-full rounded-2xl border border-border">
+                                    <Image
+                                        src={MEDIA.warehouse.src}
+                                        alt={MEDIA.warehouse.alt[lang]}
+                                        width={MEDIA.warehouse.width}
+                                        height={MEDIA.warehouse.height}
+                                        sizes="(max-width: 1024px) 100vw, 560px"
+                                    />
+                                </ParallaxFrame>
+                            </Reveal>
+                            <Parallax amount={28} className="relative z-10">
+                                <div className="card -mt-10 ml-auto mr-0 w-[92%] p-6 shadow-[0_18px_40px_-18px_rgb(15,43,70,0.3)]">
+                                    <p className="eyebrow">{t.wholesalers.timelineLabel}</p>
+                                    <Timeline steps={t.wholesalers.timeline} tones={timelineTones} />
+                                </div>
+                            </Parallax>
+                        </div>
                         <div className="order-1 lg:order-2">
                             <SectionHead
                                 align="left"
@@ -329,7 +325,7 @@ export async function Landing({ lang }: { lang: Lang }) {
                                 sub={t.wholesalers.sub}
                             />
                             <Bullets items={t.wholesalers.bullets} />
-                            <a href={`${APP_URL}/login`} className="btn btn-primary mt-8">
+                            <a href={appEntry(lang, 'wholesale')} className="btn btn-primary mt-8">
                                 {t.wholesalers.cta} <ArrowRight size={17} aria-hidden="true" />
                             </a>
                         </div>
@@ -339,22 +335,7 @@ export async function Landing({ lang }: { lang: Lang }) {
                 {/* ── Capability grid ─────────────────────── */}
                 <Section id="features">
                     <SectionHead eyebrow={t.features.eyebrow} title={t.features.title} />
-                    <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                        {t.features.cards.map((f, i) => {
-                            const Icon = featureIcons[i];
-                            return (
-                                <Reveal key={f.title} delay={i * 50}>
-                                    <div className="card card-hover h-full p-7">
-                                        <div className="grid h-11 w-11 place-items-center rounded-xl bg-accent-tint text-accent-strong">
-                                            <Icon size={20} aria-hidden="true" />
-                                        </div>
-                                        <h3 className="mt-5 font-display text-lg font-bold text-navy">{f.title}</h3>
-                                        <p className="mt-2 text-[0.95rem] leading-relaxed text-muted">{f.body}</p>
-                                    </div>
-                                </Reveal>
-                            );
-                        })}
-                    </div>
+                    <Bento lang={lang} />
                 </Section>
 
                 {/* ── Reorder spotlight ───────────────────── */}
@@ -365,16 +346,21 @@ export async function Landing({ lang }: { lang: Lang }) {
                             <p className="mt-4 text-lg leading-relaxed text-muted">{t.reorder.body}</p>
                             <p className="mt-5 text-sm text-muted">{t.reorder.foot}</p>
                         </div>
-                        <Reveal>
+                        <Reveal variant="zoom">
                             <div className="card divide-y divide-border overflow-hidden">
                                 {t.reorder.rows.map(([name, cover, action], i) => (
-                                    <div key={name} className="flex items-center justify-between gap-4 p-5">
+                                    <Reveal
+                                        key={name}
+                                        variant="right"
+                                        delay={250 + i * 160}
+                                        className="flex items-center justify-between gap-4 p-5"
+                                    >
                                         <div>
                                             <p className="font-semibold text-navy">{name}</p>
                                             <p className="tabular text-sm text-muted">{cover}</p>
                                         </div>
                                         <span className={`chip ${toneChip(TONES[i])}`}>{action}</span>
-                                    </div>
+                                    </Reveal>
                                 ))}
                             </div>
                         </Reveal>
@@ -384,7 +370,7 @@ export async function Landing({ lang }: { lang: Lang }) {
                 {/* ── Staff control + automation ──────────── */}
                 <Section>
                     <div className="grid gap-5 lg:grid-cols-2">
-                        <Reveal>
+                        <Reveal variant="left" className="h-full">
                             <div className="card h-full p-9">
                                 <div className="grid h-11 w-11 place-items-center rounded-xl bg-navy-tint text-navy">
                                     <Lock size={20} aria-hidden="true" />
@@ -394,7 +380,7 @@ export async function Landing({ lang }: { lang: Lang }) {
                                 <p className="mt-4 text-sm text-muted">{t.staff.note}</p>
                             </div>
                         </Reveal>
-                        <Reveal delay={80}>
+                        <Reveal variant="right" delay={120} className="h-full">
                             <div className="card h-full p-9">
                                 <h3 className="font-display text-2xl font-extrabold text-navy">
                                     {t.automation.title}
@@ -423,32 +409,9 @@ export async function Landing({ lang }: { lang: Lang }) {
                 </Section>
 
                 {/* ── Product tour ────────────────────────── */}
-                {/* TODO: replace these stylised panels with real captures from the seeded demo. */}
-                <Section id="tour" className="bg-navy">
+                <Section id="tour" className="overflow-hidden bg-navy">
                     <SectionHead onNavy eyebrow={t.tour.eyebrow} title={t.tour.title} sub={t.tour.sub} />
-                    <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-                        {t.tour.items.map((s, i) => {
-                            const img = tourImages[i];
-                            return (
-                                <Reveal key={s.title} delay={i * 60}>
-                                    <figure className="h-full overflow-hidden rounded-2xl border border-white/12 bg-white/[0.06]">
-                                        <Image
-                                            src={img.src}
-                                            alt={img.alt[lang]}
-                                            width={img.width}
-                                            height={img.height}
-                                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 280px"
-                                            className="h-40 w-full object-cover"
-                                        />
-                                        <figcaption className="border-t border-white/12 p-5">
-                                            <p className="font-display font-bold text-white">{s.title}</p>
-                                            <p className="mt-1.5 text-sm leading-relaxed text-white/70">{s.cap}</p>
-                                        </figcaption>
-                                    </figure>
-                                </Reveal>
-                            );
-                        })}
-                    </div>
+                    <DashboardShowcase lang={lang} />
                 </Section>
 
                 {/* ── How it works ────────────────────────── */}
@@ -456,14 +419,16 @@ export async function Landing({ lang }: { lang: Lang }) {
                     <SectionHead eyebrow={t.how.eyebrow} title={t.how.title} />
                     <div className="mt-14 grid gap-5 md:grid-cols-3">
                         {t.how.steps.map(([title, desc], i) => (
-                            <Reveal key={title} delay={i * 70}>
-                                <div className="card h-full p-8">
-                                    <span className="font-display text-4xl font-extrabold text-sand">
-                                        {String(i + 1).padStart(2, '0')}
-                                    </span>
-                                    <h3 className="mt-5 font-display text-lg font-bold text-navy">{title}</h3>
-                                    <p className="mt-2 text-[0.95rem] leading-relaxed text-muted">{desc}</p>
-                                </div>
+                            <Reveal key={title} variant="zoom" delay={i * 150} className="h-full">
+                                <Tilt className="h-full rounded-2xl">
+                                    <div className="card card-hover h-full p-8">
+                                        <span className="font-display text-4xl font-extrabold text-sand">
+                                            {String(i + 1).padStart(2, '0')}
+                                        </span>
+                                        <h3 className="mt-5 font-display text-lg font-bold text-navy">{title}</h3>
+                                        <p className="mt-2 text-[0.95rem] leading-relaxed text-muted">{desc}</p>
+                                    </div>
+                                </Tilt>
                             </Reveal>
                         ))}
                     </div>
@@ -478,26 +443,26 @@ export async function Landing({ lang }: { lang: Lang }) {
                             {t.install.chips.map((label, i) => {
                                 const Icon = installIcons[i];
                                 return (
-                                    <span
-                                        key={label}
-                                        className="chip border border-border bg-surface px-4 py-2 text-sm text-navy"
-                                    >
-                                        <Icon size={16} aria-hidden="true" className="text-accent-strong" />
-                                        {label}
-                                    </span>
+                                    <Reveal key={label} variant="zoom" delay={i * 120}>
+                                        <span className="chip border border-border bg-surface px-4 py-2 text-sm text-navy">
+                                            <Icon size={16} aria-hidden="true" className="text-accent-strong" />
+                                            {label}
+                                        </span>
+                                    </Reveal>
                                 );
                             })}
                         </div>
                         </div>
-                        <Reveal>
-                            <Image
-                                src={MEDIA.kiranaStore.src}
-                                alt={MEDIA.kiranaStore.alt[lang]}
-                                width={MEDIA.kiranaStore.width}
-                                height={MEDIA.kiranaStore.height}
-                                sizes="(max-width: 1024px) 100vw, 460px"
-                                className="aspect-[4/5] w-full rounded-2xl border border-border object-cover"
-                            />
+                        <Reveal variant="wipe">
+                            <ParallaxFrame className="aspect-[4/5] w-full rounded-2xl border border-border">
+                                <Image
+                                    src={MEDIA.kiranaStore.src}
+                                    alt={MEDIA.kiranaStore.alt[lang]}
+                                    width={MEDIA.kiranaStore.width}
+                                    height={MEDIA.kiranaStore.height}
+                                    sizes="(max-width: 1024px) 100vw, 460px"
+                                />
+                            </ParallaxFrame>
                         </Reveal>
                     </div>
                 </Section>
@@ -508,10 +473,11 @@ export async function Landing({ lang }: { lang: Lang }) {
                     <p className="mt-6 text-center text-sm font-semibold text-accent-strong">{t.pricing.anchor}</p>
 
                     <div className="mt-12 grid gap-5 md:grid-cols-3">
-                        {plans.map((p) => (
+                        {plans.map((p, i) => (
+                            <Reveal key={p.key} delay={i * 130} className="h-full">
+                            <Tilt max={4} className="h-full rounded-2xl">
                             <div
-                                key={p.key}
-                                className={`relative flex flex-col overflow-hidden rounded-2xl border bg-surface ${
+                                className={`relative flex h-full flex-col overflow-hidden rounded-2xl border bg-surface transition-[transform,box-shadow] duration-300 hover:-translate-y-1.5 hover:shadow-[0_28px_50px_-28px_rgb(15,43,70,0.4)] ${
                                     p.highlight ? 'border-2 border-accent-bright' : 'border-border'
                                 }`}
                             >
@@ -538,7 +504,7 @@ export async function Landing({ lang }: { lang: Lang }) {
                                                 p.highlight ? 'text-accent-strong' : 'text-navy'
                                             }`}
                                         >
-                                            {inr(p.price)}
+                                            <CountUp value={inr(p.price)} onView />
                                         </span>
                                         <span className="text-muted">/{t.pricing.per}</span>
                                     </p>
@@ -553,13 +519,15 @@ export async function Landing({ lang }: { lang: Lang }) {
                                     </ul>
 
                                     <a
-                                        href={`${APP_URL}/login`}
+                                        href={appEntry(lang)}
                                         className={`btn mt-8 w-full ${p.highlight ? 'btn-primary' : 'btn-secondary'}`}
                                     >
                                         {p.price === 0 ? t.pricing.startFree : t.pricing.choose(p.name)}
                                     </a>
                                 </div>
                             </div>
+                            </Tilt>
+                            </Reveal>
                         ))}
                     </div>
 
@@ -573,31 +541,7 @@ export async function Landing({ lang }: { lang: Lang }) {
                 </Section>
 
                 {/* ── Final CTA ───────────────────────────── */}
-                <Section>
-                    <div className="relative overflow-hidden rounded-3xl">
-                        <Image
-                            src={MEDIA.byculla.src}
-                            alt=""
-                            aria-hidden="true"
-                            width={MEDIA.byculla.width}
-                            height={MEDIA.byculla.height}
-                            sizes="(max-width: 1200px) 100vw, 1200px"
-                            className="absolute inset-0 h-full w-full object-cover object-center"
-                        />
-                        {/* Heavy navy wash — white on this measures well past AA. */}
-                        <div aria-hidden="true" className="absolute inset-0 bg-navy/90" />
-                        <div className="relative px-6 py-20 text-center sm:px-14">
-                            <h2 className="font-display text-3xl font-extrabold text-white sm:text-[2.75rem] sm:leading-[1.12]">
-                                {t.finalCta.title}
-                            </h2>
-                            <p className="mx-auto mt-5 max-w-lg text-lg text-white/75">{t.finalCta.sub}</p>
-                            <a href={`${APP_URL}/login`} className="btn btn-primary mt-9">
-                                {t.finalCta.button} <ArrowRight size={17} aria-hidden="true" />
-                            </a>
-                            <p className="mt-5 text-sm text-white/60">{t.finalCta.foot}</p>
-                        </div>
-                    </div>
-                </Section>
+                <FinalCta lang={lang} />
             </main>
 
             {/* ── Footer ──────────────────────────────────── */}
@@ -625,7 +569,7 @@ export async function Landing({ lang }: { lang: Lang }) {
                                     {col.head === t.footer.columns[0].head && (
                                         <li>
                                             <a
-                                                href={`${APP_URL}/login`}
+                                                href={appEntry(lang)}
                                                 className="text-sm text-white/60 transition-colors hover:text-white"
                                             >
                                                 {t.nav.login}
@@ -640,6 +584,8 @@ export async function Landing({ lang }: { lang: Lang }) {
                     <div className="mt-12 border-t border-white/10 pt-6 text-sm text-white/50">{t.footer.legal}</div>
                 </div>
             </footer>
+
+            <StickyCta lang={lang} />
         </div>
     );
 }

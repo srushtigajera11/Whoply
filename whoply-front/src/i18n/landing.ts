@@ -1,5 +1,5 @@
 /**
- * Landing-site copy, English + Hindi.
+ * Landing-site copy, English + Hindi + Gujarati.
  *
  * Terminology deliberately matches `whoply-app/src/i18n/translations.ts`
  * (उधार, गोदाम, डीलर, बकाया, मुनाफ़ा) so the marketing site and the product
@@ -53,6 +53,18 @@ export interface LandingCopy {
             rows: [string, string][];
             retailAction: string;
             wholesaleAction: string;
+            retailBusiness: string;
+            wholesaleBusiness: string;
+            /** Labels on the floating cards around the hero cutout. */
+            alert: string;
+            reminder: string;
+            /** Looping "bill being made" story in the hero mock. Items are [name, qty, ₹amount]. */
+            bill: {
+                total: string;
+                sent: string;
+                retailItems: [string, string, number][];
+                wholesaleItems: [string, string, number][];
+            };
         };
     };
     marquee: { label: string; items: string[] };
@@ -65,6 +77,8 @@ export interface LandingCopy {
         bullets: string[];
         cta: string;
         stats: [string, string][];
+        /** Hotspots on the counter-kit photo — only hardware the app really supports. */
+        kit: { label: string; hint: string; items: { title: string; body: string }[] };
     };
     wholesalers: {
         eyebrow: string;
@@ -79,7 +93,8 @@ export interface LandingCopy {
     reorder: { eyebrow: string; title: string; body: string; foot: string; rows: [string, string, string][] };
     staff: { title: string; body: string; note: string };
     automation: { title: string; items: { when: string; what: string }[] };
-    tour: { eyebrow: string; title: string; sub: string; items: { title: string; cap: string }[] };
+    /** Dashboard showcase — items map, in order, to the hotspots in DashboardShowcase. */
+    tour: { eyebrow: string; title: string; sub: string; hint: string; items: { title: string; cap: string }[] };
     how: { eyebrow: string; title: string; steps: [string, string][] };
     install: { eyebrow: string; title: string; sub: string; chips: string[] };
     pricing: {
@@ -95,7 +110,8 @@ export interface LandingCopy {
         foot: string;
     };
     faq: { eyebrow: string; title: string; qa: [string, string][] };
-    finalCta: { title: string; sub: string; button: string; foot: string };
+    finalCta: { eyebrow: string; title: string; sub: string; button: string; foot: string };
+    contact: { whatsapp: string; whatsappMsg: string };
     footer: {
         tagline: string;
         columns: { head: string; links: [string, string][] }[];
@@ -173,6 +189,24 @@ const en: LandingCopy = {
             ],
             retailAction: 'New GST Bill',
             wholesaleAction: 'New bulk order',
+            retailBusiness: 'Sharma General Store',
+            wholesaleBusiness: 'Gupta Distributors',
+            alert: 'Running low',
+            reminder: 'Reminder sent',
+            bill: {
+                total: 'Total',
+                sent: 'Bill sent on WhatsApp',
+                retailItems: [
+                    ['Parle-G 200g', '×4', 100],
+                    ['Tata Salt 1kg', '×2', 56],
+                    ['Amul Butter 100g', '×1', 58],
+                ],
+                wholesaleItems: [
+                    ['Parle-G 200g', '×20 ctn', 14400],
+                    ['Tata Salt 1kg', '×10 bags', 6720],
+                    ['Colgate 100g', '×6 ctn', 8640],
+                ],
+            },
         },
     },
     marquee: {
@@ -254,6 +288,16 @@ const en: LandingCopy = {
             ['Udhar aging', 'Oldest first'],
             ['Day close', 'One tap'],
         ],
+        kit: {
+            label: 'Works with your counter',
+            hint: 'Tap a dot to see how each one works with Whoply.',
+            items: [
+                { title: 'Tablet or phone', body: 'Bill on whichever screen sits at your counter — cash, UPI, card, or split across all three.' },
+                { title: 'Thermal printer', body: 'Prints the GST bill on 58mm or 80mm rolls — or as a full A4 invoice.' },
+                { title: 'Barcode scanner', body: 'Plug in a USB scanner, or scan with your phone’s camera. On the Pro plan.' },
+                { title: 'UPI QR', body: 'Shows your UPI QR with the bill amount already filled in. The customer just scans and pays.' },
+            ],
+        },
     },
     wholesalers: {
         eyebrow: 'For wholesalers',
@@ -343,14 +387,16 @@ const en: LandingCopy = {
         ],
     },
     tour: {
-        eyebrow: 'A day with Whoply',
-        title: 'Built for the way you already work',
-        sub: 'From the counter, to the godown, to the truck at the gate.',
+        eyebrow: 'The dashboard',
+        title: 'Your whole business, on one screen',
+        sub: 'Everything you used to flip through registers for — in one place, every morning.',
+        hint: 'Tap a dot, or pick from the list',
         items: [
-            { title: 'Your numbers, on your phone', cap: 'Today’s sales, profit and dues — wherever you are.' },
-            { title: 'Who owes you what', cap: 'The udhar list, oldest first, ready to chase.' },
-            { title: 'Out the gate, tracked', cap: 'E-way bill raised, dispatch logged, delivery followed.' },
-            { title: 'Stock you can trust', cap: 'Batches, expiry, and what’s actually on the shelf.' },
+            { title: 'Today’s sales, as they happen', cap: 'Every bill lands here the moment it’s made, with the week’s trend beside it.' },
+            { title: 'What’s actually selling', cap: 'Your best sellers by quantity and value — stock more of what moves.' },
+            { title: 'Every order, and where it is', cap: 'Delivered, processing or pending — no phone calls to find out.' },
+            { title: 'Low stock, before it runs out', cap: 'Items about to finish are flagged with exactly how many are left.' },
+            { title: 'Where the money went', cap: 'Rent, purchases and bills sorted, so the profit you see is real.' },
         ],
     },
     how: {
@@ -417,10 +463,15 @@ const en: LandingCopy = {
         ],
     },
     finalCta: {
+        eyebrow: 'Same trusted shop. Now smarter.',
         title: 'Stop running your shop on paper.',
         sub: 'Free to start. No card, no computer, no training.',
         button: 'Start free today',
         foot: 'Set up in 30 seconds · Cancel any time',
+    },
+    contact: {
+        whatsapp: 'Chat on WhatsApp',
+        whatsappMsg: 'Hi Whoply, I want to know more about the app for my business.',
     },
     footer: {
         tagline: 'Billing, stock, udhar and orders — for Bharat’s shops and wholesalers.',
@@ -526,6 +577,24 @@ const hi: LandingCopy = {
             ],
             retailAction: 'नया GST बिल',
             wholesaleAction: 'नया बल्क ऑर्डर',
+            retailBusiness: 'शर्मा जनरल स्टोर',
+            wholesaleBusiness: 'गुप्ता डिस्ट्रीब्यूटर्स',
+            alert: 'स्टॉक कम',
+            reminder: 'रिमाइंडर भेजा',
+            bill: {
+                total: 'कुल',
+                sent: 'बिल WhatsApp पर भेजा गया',
+                retailItems: [
+                    ['Parle-G 200g', '×4', 100],
+                    ['Tata Salt 1kg', '×2', 56],
+                    ['Amul Butter 100g', '×1', 58],
+                ],
+                wholesaleItems: [
+                    ['Parle-G 200g', '×20 पेटी', 14400],
+                    ['Tata Salt 1kg', '×10 बोरी', 6720],
+                    ['Colgate 100g', '×6 पेटी', 8640],
+                ],
+            },
         },
     },
     marquee: {
@@ -607,6 +676,16 @@ const hi: LandingCopy = {
             ['उधार', 'पुराने पहले'],
             ['Day close', 'एक टैप'],
         ],
+        kit: {
+            label: 'आपके काउंटर के साथ चलता है',
+            hint: 'किसी बिंदु पर टैप करें और देखें Whoply उसके साथ कैसे काम करता है।',
+            items: [
+                { title: 'टैबलेट या फ़ोन', body: 'काउंटर पर जो भी स्क्रीन हो, उसी पर बिल — कैश, UPI, कार्ड, या तीनों का बँटवारा।' },
+                { title: 'थर्मल प्रिंटर', body: '58mm या 80mm रोल पर GST बिल प्रिंट — या पूरा A4 इनवॉइस।' },
+                { title: 'बारकोड स्कैनर', body: 'USB स्कैनर लगाइए, या फ़ोन के कैमरे से स्कैन कीजिए। Pro प्लान में।' },
+                { title: 'UPI QR', body: 'बिल की रकम भरा हुआ आपका UPI QR दिखता है। ग्राहक बस स्कैन करके पेमेंट करे।' },
+            ],
+        },
     },
     wholesalers: {
         eyebrow: 'थोक विक्रेताओं के लिए',
@@ -696,14 +775,16 @@ const hi: LandingCopy = {
         ],
     },
     tour: {
-        eyebrow: 'Whoply के साथ एक दिन',
-        title: 'जैसे आप पहले से काम करते हैं, वैसे ही',
-        sub: 'काउंटर से गोदाम तक, और गेट पर खड़े ट्रक तक।',
+        eyebrow: 'डैशबोर्ड',
+        title: 'पूरा कारोबार, एक ही स्क्रीन पर',
+        sub: 'जिसके लिए रजिस्टर पलटने पड़ते थे — वो सब एक जगह, हर सुबह।',
+        hint: 'किसी बिंदु पर टैप करें, या लिस्ट से चुनें',
         items: [
-            { title: 'आपके आंकड़े, आपके फ़ोन पर', cap: 'आज की बिक्री, मुनाफ़ा और बकाया — आप जहाँ भी हों।' },
-            { title: 'किस पर कितना बाकी', cap: 'उधार की लिस्ट, पुराने पहले, वसूली के लिए तैयार।' },
-            { title: 'गेट से बाहर, नज़र में', cap: 'E-way bill बना, डिस्पैच दर्ज, डिलीवरी पर नज़र।' },
-            { title: 'स्टॉक जिस पर भरोसा हो', cap: 'बैच, एक्सपायरी, और शेल्फ़ पर असल में क्या है।' },
+            { title: 'आज की बिक्री, उसी वक़्त', cap: 'हर बिल बनते ही यहाँ दिखता है, साथ में पूरे हफ़्ते का ट्रेंड।' },
+            { title: 'असल में क्या बिक रहा है', cap: 'मात्रा और कीमत के हिसाब से सबसे ज़्यादा बिकने वाला माल — जो चलता है, वही ज़्यादा रखें।' },
+            { title: 'हर ऑर्डर, और वो कहाँ है', cap: 'डिलीवर, प्रोसेसिंग या पेंडिंग — पता करने के लिए फ़ोन नहीं करना पड़ता।' },
+            { title: 'स्टॉक खत्म होने से पहले', cap: 'जो माल खत्म होने वाला है, वो ठीक कितना बचा है, उसके साथ दिखता है।' },
+            { title: 'पैसा कहाँ गया', cap: 'किराया, खरीद और बिल अलग-अलग — ताकि जो मुनाफ़ा दिखे, वो असली हो।' },
         ],
     },
     how: {
@@ -770,10 +851,15 @@ const hi: LandingCopy = {
         ],
     },
     finalCta: {
+        eyebrow: 'वही भरोसेमंद दुकान। अब और स्मार्ट।',
         title: 'अब दुकान कागज़ पर नहीं।',
         sub: 'शुरुआत मुफ़्त। न कार्ड, न कंप्यूटर, न ट्रेनिंग।',
         button: 'आज ही मुफ़्त शुरू करें',
         foot: '30 सेकंड में सेटअप · कभी भी बंद करें',
+    },
+    contact: {
+        whatsapp: 'WhatsApp पर बात करें',
+        whatsappMsg: 'नमस्ते Whoply, मुझे अपने व्यापार के लिए ऐप के बारे में जानना है।',
     },
     footer: {
         tagline: 'बिलिंग, स्टॉक, उधार और ऑर्डर — भारत की दुकानों और थोक विक्रेताओं के लिए।',
@@ -879,6 +965,24 @@ const gu: LandingCopy = {
             ],
             retailAction: 'નવું GST બિલ',
             wholesaleAction: 'નવો જથ્થાબંધ ઓર્ડર',
+            retailBusiness: 'શર્મા જનરલ સ્ટોર',
+            wholesaleBusiness: 'ગુપ્તા ડિસ્ટ્રિબ્યુટર્સ',
+            alert: 'સ્ટોક ઓછો',
+            reminder: 'રિમાઇન્ડર મોકલ્યું',
+            bill: {
+                total: 'કુલ',
+                sent: 'બિલ WhatsApp પર મોકલ્યું',
+                retailItems: [
+                    ['Parle-G 200g', '×4', 100],
+                    ['Tata Salt 1kg', '×2', 56],
+                    ['Amul Butter 100g', '×1', 58],
+                ],
+                wholesaleItems: [
+                    ['Parle-G 200g', '×20 પેટી', 14400],
+                    ['Tata Salt 1kg', '×10 ગુણ', 6720],
+                    ['Colgate 100g', '×6 પેટી', 8640],
+                ],
+            },
         },
     },
     marquee: {
@@ -960,6 +1064,16 @@ const gu: LandingCopy = {
             ['ઉધાર', 'જૂનું પહેલાં'],
             ['Day close', 'એક ટેપ'],
         ],
+        kit: {
+            label: 'તમારા કાઉન્ટર સાથે ચાલે છે',
+            hint: 'કોઈ પણ બિંદુ પર ટેપ કરો અને જુઓ Whoply તેની સાથે કેવી રીતે કામ કરે છે.',
+            items: [
+                { title: 'ટેબ્લેટ કે ફોન', body: 'કાઉન્ટર પર જે સ્ક્રીન હોય તેના પર જ બિલ — રોકડ, UPI, કાર્ડ, કે ત્રણેયનું વિભાજન.' },
+                { title: 'થર્મલ પ્રિન્ટર', body: '58mm કે 80mm રોલ પર GST બિલ પ્રિન્ટ — અથવા પૂરું A4 ઇનવોઇસ.' },
+                { title: 'બારકોડ સ્કેનર', body: 'USB સ્કેનર લગાવો, કે ફોનના કેમેરાથી સ્કેન કરો. Pro પ્લાનમાં.' },
+                { title: 'UPI QR', body: 'બિલની રકમ ભરેલો તમારો UPI QR દેખાય છે. ગ્રાહક બસ સ્કેન કરીને ચૂકવે.' },
+            ],
+        },
     },
     wholesalers: {
         eyebrow: 'જથ્થાબંધ વેપારીઓ માટે',
@@ -1049,14 +1163,16 @@ const gu: LandingCopy = {
         ],
     },
     tour: {
-        eyebrow: 'Whoply સાથે એક દિવસ',
-        title: 'તમે પહેલેથી જે રીતે કામ કરો છો, એ જ રીતે',
-        sub: 'કાઉન્ટરથી ગોદામ સુધી, અને ગેટ પર ઊભેલી ટ્રક સુધી.',
+        eyebrow: 'ડેશબોર્ડ',
+        title: 'આખો વેપાર, એક જ સ્ક્રીન પર',
+        sub: 'જેના માટે ચોપડા ફેરવવા પડતા — તે બધું એક જગ્યાએ, દરરોજ સવારે.',
+        hint: 'કોઈ બિંદુ પર ટેપ કરો, કે યાદીમાંથી પસંદ કરો',
         items: [
-            { title: 'તમારા આંકડા, તમારા ફોન પર', cap: 'આજનું વેચાણ, નફો અને બાકી — તમે જ્યાં પણ હો.' },
-            { title: 'કોના પર કેટલું બાકી', cap: 'ઉધારની યાદી, જૂનું પહેલાં, વસૂલાત માટે તૈયાર.' },
-            { title: 'ગેટથી બહાર, નજરમાં', cap: 'E-way bill બન્યું, ડિસ્પેચ નોંધાયું, ડિલિવરી પર નજર.' },
-            { title: 'સ્ટોક જેના પર ભરોસો હોય', cap: 'બેચ, એક્સપાયરી, અને શેલ્ફ પર ખરેખર શું છે.' },
+            { title: 'આજનું વેચાણ, એ જ ક્ષણે', cap: 'દરેક બિલ બનતાં જ અહીં દેખાય છે, સાથે આખા અઠવાડિયાનો ટ્રેન્ડ.' },
+            { title: 'ખરેખર શું વેચાય છે', cap: 'જથ્થા અને કિંમત પ્રમાણે સૌથી વધુ વેચાતો માલ — જે ચાલે છે, તે વધુ રાખો.' },
+            { title: 'દરેક ઓર્ડર, અને તે ક્યાં છે', cap: 'ડિલિવર, પ્રોસેસિંગ કે પેન્ડિંગ — જાણવા માટે ફોન નહીં કરવો પડે.' },
+            { title: 'સ્ટોક ખલાસ થાય તે પહેલાં', cap: 'જે માલ ખલાસ થવાનો છે, તે બરાબર કેટલો બચ્યો છે તેની સાથે દેખાય છે.' },
+            { title: 'પૈસા ક્યાં ગયા', cap: 'ભાડું, ખરીદી અને બિલ અલગ-અલગ — જેથી જે નફો દેખાય, તે સાચો હોય.' },
         ],
     },
     how: {
@@ -1123,10 +1239,15 @@ const gu: LandingCopy = {
         ],
     },
     finalCta: {
+        eyebrow: 'એ જ ભરોસાપાત્ર દુકાન. હવે વધુ સ્માર્ટ.',
         title: 'હવે દુકાન કાગળ પર નહીં.',
         sub: 'શરૂઆત મફત. ન કાર્ડ, ન કમ્પ્યુટર, ન તાલીમ.',
         button: 'આજે જ મફત શરૂ કરો',
         foot: '30 સેકન્ડમાં સેટઅપ · ગમે ત્યારે બંધ કરો',
+    },
+    contact: {
+        whatsapp: 'WhatsApp પર વાત કરો',
+        whatsappMsg: 'નમસ્તે Whoply, મારે મારા ધંધા માટે એપ વિશે જાણવું છે.',
     },
     footer: {
         tagline: 'બિલિંગ, સ્ટોક, ઉધાર અને ઓર્ડર — ભારતની દુકાનો અને જથ્થાબંધ વેપારીઓ માટે.',

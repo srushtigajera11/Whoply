@@ -82,7 +82,7 @@ export function Hero({ lang }: { lang: Lang }) {
                 <div aria-hidden="true" className="hero-dots pointer-events-none absolute inset-0" />
 
                 {/* No bottom padding: the stage stands on the marquee below. */}
-                <div className="relative mx-auto grid max-w-[1200px] items-end gap-6 px-5 pt-12 md:pt-16 lg:grid-cols-[1.06fr_0.94fr] lg:pt-10">
+                <div className="wrap relative grid items-end gap-6 pt-12 md:pt-16 lg:grid-cols-2 lg:pt-10">
                     <div className="text-center lg:self-center lg:pb-14 lg:text-left">
                         {/* Role switch */}
                         <div
@@ -127,7 +127,7 @@ export function Hero({ lang }: { lang: Lang }) {
                         {/* Devanagari/Gujarati matras clip at tight leading — give them room. */}
                         <h1
                             key={`h-${role}`}
-                            className={`mt-4 font-display text-[2.5rem] font-extrabold text-navy sm:text-6xl lg:text-[3.5rem] xl:text-[3.9rem] ${
+                            className={`mt-4 font-display text-[2.5rem] font-extrabold text-navy sm:text-6xl lg:text-[3.5rem] xl:text-[4.1rem] 2xl:text-[4.5rem] ${
                                 lang === 'en' ? 'leading-[1.06]' : 'leading-[1.3]'
                             }`}
                         >
@@ -253,7 +253,7 @@ function HeroStage({
     const layer = { px, py };
 
     return (
-        <div className="relative mx-auto h-[430px] w-full max-w-[560px] sm:h-[540px] lg:h-[640px]">
+        <div className="relative mx-auto h-[430px] w-full max-w-[560px] sm:h-[540px] lg:ml-auto lg:h-[680px] lg:max-w-[640px] xl:h-[740px] xl:max-w-[700px]">
             <Layer {...layer} depth={-8} className="absolute inset-x-[5%] -bottom-[16%] aspect-square">
                 <div className="hero-dome absolute inset-0 rounded-full" />
                 <svg
@@ -281,7 +281,7 @@ function HeroStage({
                     alt={MEDIA.heroCutout.alt[lang]}
                     fill
                     priority
-                    sizes="(max-width: 640px) 92vw, 560px"
+                    sizes="(max-width: 640px) 92vw, 700px"
                     className="cutout-rise object-contain object-bottom"
                 />
             </Layer>

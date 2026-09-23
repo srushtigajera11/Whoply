@@ -116,7 +116,7 @@ export function DashboardShowcase({ lang }: { lang: Lang }) {
                             alt={MEDIA.dashboard.alt[lang]}
                             width={MEDIA.dashboard.width}
                             height={MEDIA.dashboard.height}
-                            sizes="(max-width: 1024px) 100vw, 820px"
+                            sizes="(max-width: 1024px) 100vw, 1000px"
                             className="spot-mask relative h-auto w-full"
                         />
                         {SPOTS.map((s, i) => (

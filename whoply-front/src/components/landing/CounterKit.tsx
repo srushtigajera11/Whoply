@@ -47,7 +47,7 @@ export function CounterKit({ lang }: { lang: Lang }) {
                     alt={MEDIA.counterKit.alt[lang]}
                     width={MEDIA.counterKit.width}
                     height={MEDIA.counterKit.height}
-                    sizes="(max-width: 1024px) 100vw, 560px"
+                    sizes="(max-width: 1024px) 100vw, 700px"
                     className="spot-mask h-auto w-full"
                 />
                 {SPOTS.map((s, i) => (

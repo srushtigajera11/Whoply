@@ -29,7 +29,7 @@ export function FinalCta({ lang }: { lang: Lang }) {
 
     return (
         <section id="final-cta" className="relative overflow-hidden bg-navy">
-            <div ref={ref} className="relative mx-auto max-w-[1600px]">
+            <div ref={ref} className="relative">
                 <motion.div
                     style={reduce ? undefined : { clipPath }}
                     className="relative aspect-[4/3] w-full overflow-hidden sm:aspect-[16/10] lg:aspect-[21/10]"
@@ -47,7 +47,7 @@ export function FinalCta({ lang }: { lang: Lang }) {
                     </motion.div>
                     <div
                         aria-hidden="true"
-                        className="absolute inset-0 bg-gradient-to-b from-navy/35 via-navy/25 via-45% to-navy to-95%"
+                        className="absolute inset-0 bg-gradient-to-b from-navy/30 via-navy/75 via-58% to-navy to-92%"
                     />
                 </motion.div>
 

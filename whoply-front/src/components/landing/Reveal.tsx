@@ -98,3 +98,53 @@ export function Reveal({
         </div>
     );
 }
+
+/**
+ * A heading whose words rise out of clipped boxes one after another — the
+ * split-text reveal. Static on the server and when already on screen.
+ */
+export function RevealWords({
+    text,
+    as: Tag = 'h2',
+    stagger = 45,
+    className,
+}: {
+    text: string;
+    as?: 'h1' | 'h2' | 'h3' | 'p' | 'span';
+    stagger?: number;
+    className?: string;
+}) {
+    const [ref, state] = useReveal<HTMLElement>(0.4);
+    const on = state !== 'hidden';
+    return (
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        <Tag ref={ref as any} className={className}>
+            {text.split(' ').map((w, i) => (
+                <span key={i}>
+                    {i > 0 && ' '}
+                    <span className={cn('word-mask', on && 'on')}>
+                        <span style={{ transitionDelay: `${i * stagger}ms` }}>{w}</span>
+                    </span>
+                </span>
+            ))}
+        </Tag>
+    );
+}
+
+/** A gradient rule that draws itself along `axis` when scrolled into view. */
+export function RevealLine({ axis = 'x', delay = 0, className }: { axis?: 'x' | 'y'; delay?: number; className?: string }) {
+    const [ref, state] = useReveal<HTMLDivElement>(0.3);
+    const hidden = state === 'hidden';
+    return (
+        <div
+            ref={ref}
+            aria-hidden="true"
+            className={cn(
+                'transition-transform duration-[1400ms] ease-[cubic-bezier(0.16,1,0.3,1)]',
+                axis === 'x' ? cn('origin-left', hidden ? 'scale-x-0' : 'scale-x-100') : cn('origin-top', hidden ? 'scale-y-0' : 'scale-y-100'),
+                className
+            )}
+            style={{ transitionDelay: `${delay}ms` }}
+        />
+    );
+}

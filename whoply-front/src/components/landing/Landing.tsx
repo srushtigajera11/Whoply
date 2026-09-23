@@ -3,20 +3,15 @@ import {
     ArrowRight,
     BadgeCheck,
     BarChart3,
-    CalendarClock,
     Check,
     ClipboardList,
-    FileSpreadsheet,
-    FileText,
     Lock,
     Moon,
     Package,
     Receipt,
     RotateCcw,
-    ScrollText,
     Smartphone,
     Sunrise,
-    Truck,
     Wallet,
 } from 'lucide-react';
 import { Nav } from '@/components/Nav';
@@ -24,7 +19,10 @@ import { Logo } from '@/components/Logo';
 import { Hero } from '@/components/landing/Hero';
 import { Marquee } from '@/components/landing/Marquee';
 import { Faq } from '@/components/landing/Faq';
-import { Reveal } from '@/components/landing/Reveal';
+import { Reveal, RevealLine, RevealWords } from '@/components/landing/Reveal';
+import { Backdrop, type BackdropVariant } from '@/components/landing/Backdrop';
+import { FeatureCard } from '@/components/landing/FeatureCard';
+import { cn } from '@/lib/cn';
 import { getCopy, HREF_LANG, type Lang } from '@/i18n/landing';
 import { MEDIA } from '@/lib/media';
 import { appEntry } from '@/lib/links';
@@ -102,10 +100,24 @@ const inr = (n: number) => (n === 0 ? '₹0' : `₹${n.toLocaleString('en-IN')}`
 
 /* ── Layout helpers ──────────────────────────────────────── */
 
-function Section({ id, children, className = '' }: { id?: string; children: React.ReactNode; className?: string }) {
+function Section({
+    id,
+    children,
+    className,
+    bg,
+}: {
+    id?: string;
+    children: React.ReactNode;
+    className?: string;
+    bg?: BackdropVariant;
+}) {
     return (
-        <section id={id} className={className}>
-            <div className="mx-auto max-w-[1200px] px-5 py-20 md:py-28">{children}</div>
+        <section
+            id={id}
+            className={cn('relative', bg && 'overflow-hidden', bg === 'navy' && 'bg-navy', bg === 'tint' && 'bg-navy-tint', className)}
+        >
+            {bg && <Backdrop variant={bg} />}
+            <div className="wrap relative py-20 md:py-28">{children}</div>
         </section>
     );
 }
@@ -126,13 +138,13 @@ function SectionHead({
     return (
         <Reveal className={align === 'center' ? 'mx-auto max-w-2xl text-center' : 'max-w-2xl'}>
             <span className={`eyebrow ${onNavy ? 'eyebrow-on-navy' : ''}`}>{eyebrow}</span>
-            <h2
+            <RevealWords
+                as="h2"
+                text={title}
                 className={`mt-3 font-display text-3xl font-extrabold sm:text-[2.5rem] sm:leading-[1.15] ${
                     onNavy ? 'text-white' : 'text-navy'
                 }`}
-            >
-                {title}
-            </h2>
+            />
             {sub && <p className={`mt-4 text-lg leading-relaxed ${onNavy ? 'text-white/70' : 'text-muted'}`}>{sub}</p>}
         </Reveal>
     );
@@ -167,11 +179,12 @@ export async function Landing({ lang }: { lang: Lang }) {
     const t = getCopy(lang);
     const plans = await getPlans();
 
-    const problemIcons = [Wallet, CalendarClock, Receipt, BarChart3];
-    const complianceIcons = [FileText, Truck, ScrollText, FileSpreadsheet];
+    const problemIcons = ['wallet', 'calendarClock', 'receipt', 'barChart3'] as const;
+    const complianceIcons = ['fileText', 'truck', 'scrollText', 'fileSpreadsheet'] as const;
     const shopStatIcons = [Receipt, Package, Wallet, BarChart3];
     const automationIcons = [Moon, Sunrise, ClipboardList];
     const installIcons = [Smartphone, BadgeCheck, RotateCcw];
+    const howIcons = ['smartphone', 'package', 'receipt'] as const;
     const timelineTones = ['success', 'success', 'success', 'warning', 'danger'] as const;
 
     return (
@@ -182,7 +195,7 @@ export async function Landing({ lang }: { lang: Lang }) {
                 <Marquee lang={lang} />
 
                 {/* ── Problem ─────────────────────────────── */}
-                <Section id="problem">
+                <Section id="problem" bg="glow">
                     <div className="grid items-center gap-12 lg:grid-cols-[0.9fr_1.1fr]">
                         <Reveal variant="left">
                             {/* Photo + floating badge — the badge drifts at its own speed for depth. */}
@@ -193,7 +206,7 @@ export async function Landing({ lang }: { lang: Lang }) {
                                         alt={MEDIA.paperLedger.alt[lang]}
                                         width={MEDIA.paperLedger.width}
                                         height={MEDIA.paperLedger.height}
-                                        sizes="(max-width: 1024px) 100vw, 520px"
+                                        sizes="(max-width: 1024px) 100vw, 660px"
                                     />
                                 </ParallaxFrame>
                                 <Parallax amount={36} className="absolute -right-3 -bottom-6 z-10 sm:-right-6">
@@ -209,19 +222,12 @@ export async function Landing({ lang }: { lang: Lang }) {
                         <SectionHead align="left" eyebrow={t.problem.eyebrow} title={t.problem.title} />
                     </div>
 
-                    <div className="mt-20 grid gap-5 sm:grid-cols-2">
+                    <div className="mt-20 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
                         {t.problem.cards.map((p, i) => {
-                            const Icon = problemIcons[i];
                             return (
                                 <Reveal key={p.title} variant={i % 2 ? 'right' : 'left'} delay={i * 90} className="h-full">
                                     <Tilt className="h-full rounded-2xl">
-                                        <div className="card card-hover h-full p-7">
-                                            <div className="grid h-11 w-11 place-items-center rounded-xl bg-navy-tint text-navy">
-                                                <Icon size={20} aria-hidden="true" />
-                                            </div>
-                                            <h3 className="mt-5 font-display text-lg font-bold text-navy">{p.title}</h3>
-                                            <p className="mt-2 text-[0.95rem] leading-relaxed text-muted">{p.body}</p>
-                                        </div>
+                                        <FeatureCard icon={problemIcons[i]} title={p.title} body={p.body} delay={i * 90} />
                                     </Tilt>
                                 </Reveal>
                             );
@@ -230,7 +236,7 @@ export async function Landing({ lang }: { lang: Lang }) {
                 </Section>
 
                 {/* ── Compliance ──────────────────────────── */}
-                <Section id="compliance" className="bg-navy">
+                <Section id="compliance" bg="navy">
                     <SectionHead
                         onNavy
                         eyebrow={t.compliance.eyebrow}
@@ -239,16 +245,9 @@ export async function Landing({ lang }: { lang: Lang }) {
                     />
                     <div className="mt-14 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
                         {t.compliance.cards.map((f, i) => {
-                            const Icon = complianceIcons[i];
                             return (
                                 <Reveal key={f.title} variant="zoom" delay={i * 110} className="h-full">
-                                    <div className="h-full rounded-2xl border border-white/12 bg-white/[0.06] p-7 transition-colors duration-300 hover:border-sand/40 hover:bg-white/[0.1]">
-                                        <div className="grid h-11 w-11 place-items-center rounded-xl bg-sand text-navy">
-                                            <Icon size={20} aria-hidden="true" />
-                                        </div>
-                                        <h3 className="mt-5 font-display text-lg font-bold text-white">{f.title}</h3>
-                                        <p className="mt-2 text-[0.95rem] leading-relaxed text-white/70">{f.body}</p>
-                                    </div>
+                                    <FeatureCard dark icon={complianceIcons[i]} title={f.title} body={f.body} delay={i * 110} />
                                 </Reveal>
                             );
                         })}
@@ -257,7 +256,7 @@ export async function Landing({ lang }: { lang: Lang }) {
                 </Section>
 
                 {/* ── For shopkeepers ─────────────────────── */}
-                <Section id="shopkeepers">
+                <Section id="shopkeepers" bg="grid">
                     <div className="grid items-center gap-14 lg:grid-cols-2">
                         <div>
                             <SectionHead
@@ -296,7 +295,7 @@ export async function Landing({ lang }: { lang: Lang }) {
                 </Section>
 
                 {/* ── For wholesalers ─────────────────────── */}
-                <Section id="wholesalers" className="bg-navy-tint">
+                <Section id="wholesalers" bg="tint">
                     <div className="grid items-center gap-14 lg:grid-cols-2">
                         <div className="order-2 lg:order-1">
                             <Reveal variant="wipe">
@@ -306,7 +305,7 @@ export async function Landing({ lang }: { lang: Lang }) {
                                         alt={MEDIA.warehouse.alt[lang]}
                                         width={MEDIA.warehouse.width}
                                         height={MEDIA.warehouse.height}
-                                        sizes="(max-width: 1024px) 100vw, 560px"
+                                        sizes="(max-width: 1024px) 100vw, 700px"
                                     />
                                 </ParallaxFrame>
                             </Reveal>
@@ -333,13 +332,13 @@ export async function Landing({ lang }: { lang: Lang }) {
                 </Section>
 
                 {/* ── Capability grid ─────────────────────── */}
-                <Section id="features">
+                <Section id="features" bg="glow">
                     <SectionHead eyebrow={t.features.eyebrow} title={t.features.title} />
                     <Bento lang={lang} />
                 </Section>
 
                 {/* ── Reorder spotlight ───────────────────── */}
-                <Section className="bg-navy-tint">
+                <Section bg="tint">
                     <div className="grid items-center gap-14 lg:grid-cols-2">
                         <div>
                             <SectionHead align="left" eyebrow={t.reorder.eyebrow} title={t.reorder.title} />
@@ -368,7 +367,7 @@ export async function Landing({ lang }: { lang: Lang }) {
                 </Section>
 
                 {/* ── Staff control + automation ──────────── */}
-                <Section>
+                <Section bg="grid">
                     <div className="grid gap-5 lg:grid-cols-2">
                         <Reveal variant="left" className="h-full">
                             <div className="card h-full p-9">
@@ -390,6 +389,11 @@ export async function Landing({ lang }: { lang: Lang }) {
                                         const Icon = automationIcons[i];
                                         return (
                                             <li key={a.when} className="flex gap-4">
+                                                <RevealLine
+                                                    axis="y"
+                                                    delay={i * 220}
+                                                    className="w-1 shrink-0 self-stretch rounded-full bg-gradient-to-b from-accent-bright via-sand to-transparent"
+                                                />
                                                 <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-accent-tint text-accent-strong">
                                                     <Icon size={18} aria-hidden="true" />
                                                 </div>
@@ -409,33 +413,30 @@ export async function Landing({ lang }: { lang: Lang }) {
                 </Section>
 
                 {/* ── Product tour ────────────────────────── */}
-                <Section id="tour" className="overflow-hidden bg-navy">
+                <Section id="tour" bg="navy">
                     <SectionHead onNavy eyebrow={t.tour.eyebrow} title={t.tour.title} sub={t.tour.sub} />
                     <DashboardShowcase lang={lang} />
                 </Section>
 
                 {/* ── How it works ────────────────────────── */}
-                <Section id="how">
+                <Section id="how" bg="grid">
                     <SectionHead eyebrow={t.how.eyebrow} title={t.how.title} />
-                    <div className="mt-14 grid gap-5 md:grid-cols-3">
-                        {t.how.steps.map(([title, desc], i) => (
-                            <Reveal key={title} variant="zoom" delay={i * 150} className="h-full">
-                                <Tilt className="h-full rounded-2xl">
-                                    <div className="card card-hover h-full p-8">
-                                        <span className="font-display text-4xl font-extrabold text-sand">
-                                            {String(i + 1).padStart(2, '0')}
-                                        </span>
-                                        <h3 className="mt-5 font-display text-lg font-bold text-navy">{title}</h3>
-                                        <p className="mt-2 text-[0.95rem] leading-relaxed text-muted">{desc}</p>
-                                    </div>
-                                </Tilt>
-                            </Reveal>
-                        ))}
+                    <RevealLine className="mx-auto mt-14 h-px w-full max-w-4xl bg-gradient-to-r from-transparent via-accent-bright to-transparent" />
+                    <div className="mt-8 grid gap-5 md:grid-cols-3">
+                        {t.how.steps.map(([title, desc], i) => {
+                            return (
+                                <Reveal key={title} variant="zoom" delay={i * 150} className="h-full">
+                                    <Tilt className="h-full rounded-2xl">
+                                        <FeatureCard icon={howIcons[i]} step={i + 1} title={title} body={desc} delay={i * 150} className="p-8" />
+                                    </Tilt>
+                                </Reveal>
+                            );
+                        })}
                     </div>
                 </Section>
 
                 {/* ── Install ─────────────────────────────── */}
-                <Section id="install" className="bg-navy-tint">
+                <Section id="install" bg="tint">
                     <div className="grid items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
                         <div>
                         <SectionHead align="left" eyebrow={t.install.eyebrow} title={t.install.title} sub={t.install.sub} />
@@ -460,7 +461,7 @@ export async function Landing({ lang }: { lang: Lang }) {
                                     alt={MEDIA.kiranaStore.alt[lang]}
                                     width={MEDIA.kiranaStore.width}
                                     height={MEDIA.kiranaStore.height}
-                                    sizes="(max-width: 1024px) 100vw, 460px"
+                                    sizes="(max-width: 1024px) 100vw, 620px"
                                 />
                             </ParallaxFrame>
                         </Reveal>
@@ -468,17 +469,19 @@ export async function Landing({ lang }: { lang: Lang }) {
                 </Section>
 
                 {/* ── Pricing ─────────────────────────────── */}
-                <Section id="pricing">
+                <Section id="pricing" bg="glow">
                     <SectionHead eyebrow={t.pricing.eyebrow} title={t.pricing.title} sub={t.pricing.sub} />
                     <p className="mt-6 text-center text-sm font-semibold text-accent-strong">{t.pricing.anchor}</p>
 
                     <div className="mt-12 grid gap-5 md:grid-cols-3">
                         {plans.map((p, i) => (
                             <Reveal key={p.key} delay={i * 130} className="h-full">
-                            <Tilt max={4} className="h-full rounded-2xl">
+                            <Tilt max={4} className={cn('h-full rounded-2xl', p.highlight && 'ring-spin p-[2px] shadow-[0_28px_60px_-28px_rgb(194,80,0,0.45)]')}>
                             <div
-                                className={`relative flex h-full flex-col overflow-hidden rounded-2xl border bg-surface transition-[transform,box-shadow] duration-300 hover:-translate-y-1.5 hover:shadow-[0_28px_50px_-28px_rgb(15,43,70,0.4)] ${
-                                    p.highlight ? 'border-2 border-accent-bright' : 'border-border'
+                                className={`relative flex h-full flex-col overflow-hidden border bg-surface transition-[transform,box-shadow] duration-300 ${
+                                    p.highlight
+                                        ? 'rounded-[14px] border-transparent'
+                                        : 'rounded-2xl border-border hover:-translate-y-1.5 hover:shadow-[0_28px_50px_-28px_rgb(15,43,70,0.4)]'
                                 }`}
                             >
                                 <div className={`px-7 py-5 ${p.highlight ? 'bg-accent-tint' : 'bg-navy'}`}>
@@ -535,7 +538,7 @@ export async function Landing({ lang }: { lang: Lang }) {
                 </Section>
 
                 {/* ── FAQ ─────────────────────────────────── */}
-                <Section id="faq" className="bg-navy-tint">
+                <Section id="faq" bg="tint">
                     <SectionHead eyebrow={t.faq.eyebrow} title={t.faq.title} />
                     <Faq lang={lang} />
                 </Section>
@@ -546,7 +549,7 @@ export async function Landing({ lang }: { lang: Lang }) {
 
             {/* ── Footer ──────────────────────────────────── */}
             <footer className="bg-navy-dark">
-                <div className="mx-auto max-w-[1200px] px-5 py-16">
+                <div className="wrap py-16">
                     <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
                         <div>
                             <Logo size={30} onNavy />

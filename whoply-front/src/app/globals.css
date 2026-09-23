@@ -54,6 +54,7 @@
 
     /* ── Motion ────────────────────────────────────────── */
     --animate-marquee: marquee 38s linear infinite;
+    --animate-marquee-rev: marquee-rev 46s linear infinite;
 }
 
 @keyframes marquee {
@@ -173,6 +174,27 @@
     to { transform: scaleX(1); }
 }
 
+/* ── Backdrops & card ornaments ───────────────────────── */
+@keyframes marquee-rev {
+    from { transform: translateX(-50%); }
+    to { transform: translateX(0); }
+}
+/* Two slow, different paths so neighbouring blobs never move in step. */
+@keyframes drift-a {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(7%, -9%) scale(1.08); }
+    66% { transform: translate(-5%, 6%) scale(0.94); }
+}
+@keyframes drift-b {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    40% { transform: translate(-9%, 5%) scale(1.1); }
+    70% { transform: translate(6%, -7%) scale(0.92); }
+}
+@keyframes border-spin {
+    to { --ring-angle: 360deg; }
+}
+@property --ring-angle { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+
 /* Registered so the spotlight can glide between hotspots — unregistered custom
    properties swap instantly. Browsers without @property simply jump. */
 @property --spot-x { syntax: "<percentage>"; inherits: true; initial-value: 50%; }
@@ -239,6 +261,14 @@
    ============================================================ */
 
 @layer components {
+    /* The page column. Fluid gutter — 20px on phones, up to 56px on wide screens. */
+    .wrap {
+        width: 100%;
+        max-width: 1520px;
+        margin-inline: auto;
+        padding-inline: clamp(1.25rem, 3vw, 3.5rem);
+    }
+
     /* Money and any figure that sits in a column. */
     .tabular {
         font-variant-numeric: tabular-nums;
@@ -468,6 +498,80 @@
     @media (prefers-reduced-motion: reduce) {
         .pop-in, .float-y, .orbit, .cutout-rise, .spot-ping, .spot-progress {
             animation: none;
+        }
+    }
+
+    /* ── Section backdrops ─────────────────────────────── */
+    /* Faint line grid, strongest under the heading, gone at the edges. */
+    .bg-grid {
+        background-image:
+            linear-gradient(rgb(15 43 70 / 0.07) 1px, transparent 1px),
+            linear-gradient(90deg, rgb(15 43 70 / 0.07) 1px, transparent 1px);
+        background-size: 44px 44px;
+        -webkit-mask-image: radial-gradient(ellipse 75% 70% at 50% 35%, #000 25%, transparent 78%);
+        mask-image: radial-gradient(ellipse 75% 70% at 50% 35%, #000 25%, transparent 78%);
+    }
+    .bg-dots-navy {
+        background-image: radial-gradient(rgb(255 255 255 / 0.13) 1px, transparent 1.4px);
+        background-size: 26px 26px;
+        -webkit-mask-image: radial-gradient(ellipse 70% 65% at 50% 30%, #000 20%, transparent 75%);
+        mask-image: radial-gradient(ellipse 70% 65% at 50% 30%, #000 20%, transparent 75%);
+    }
+    /* Soft colour blobs that drift behind a section. */
+    .blob {
+        position: absolute;
+        border-radius: 9999px;
+        /* Lighter blur on phones — big blurred layers are costly on budget GPUs. */
+        filter: blur(48px);
+        pointer-events: none;
+        will-change: transform;
+    }
+    @media (min-width: 768px) {
+        .blob { filter: blur(70px); }
+    }
+    .drift-a { animation: drift-a 26s ease-in-out infinite; }
+    .drift-b { animation: drift-b 32s ease-in-out infinite; }
+
+    /* ── Card ornaments ────────────────────────────────── */
+    /* A word rising out of a clipped box. Padding keeps descenders and
+       Devanagari/Gujarati matras inside the clip. */
+    .word-mask {
+        display: inline-block;
+        overflow: hidden;
+        vertical-align: bottom;
+        padding: 0.18em 0.02em 0.14em;
+        margin: -0.18em -0.02em -0.14em;
+    }
+    .word-mask > span {
+        display: inline-block;
+        transform: translateY(115%);
+        transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .word-mask.on > span {
+        transform: none;
+    }
+
+    /* Rotating gradient rim — wrap a card in this with 2px padding. */
+    .ring-spin {
+        background: conic-gradient(
+            from var(--ring-angle),
+            var(--color-accent-bright) 0%,
+            var(--color-sand) 25%,
+            var(--color-accent-tint) 45%,
+            var(--color-accent-bright) 60%,
+            var(--color-sand) 80%,
+            var(--color-accent-bright) 100%
+        );
+        animation: border-spin 7s linear infinite;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .drift-a, .drift-b, .ring-spin, .animate-marquee-rev {
+            animation: none;
+        }
+        .word-mask > span {
+            transform: none;
+            transition: none;
         }
     }
 

@@ -69,7 +69,7 @@ export function Nav({ lang }: { lang: Lang }) {
                     style={{ scaleX: progress }}
                     className="absolute inset-x-0 bottom-0 h-0.5 origin-left bg-accent-bright"
                 />
-                <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between px-5">
+                <div className="wrap flex h-16 items-center justify-between">
                     <a href={pathFor(lang)} aria-label={t.nav.home}>
                         <Logo size={30} onNavy />
                     </a>

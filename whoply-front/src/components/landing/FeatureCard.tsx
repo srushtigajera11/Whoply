@@ -6,7 +6,7 @@ import {
     FileSpreadsheet,
     FileText,
     Package,
-    Receipt,
+    ReceiptIndianRupee,
     ScrollText,
     Smartphone,
     Truck,
@@ -19,7 +19,7 @@ import { useReveal } from './Reveal';
 const ICONS = {
     wallet: Wallet,
     calendarClock: CalendarClock,
-    receipt: Receipt,
+    receipt: ReceiptIndianRupee,
     barChart3: BarChart3,
     fileText: FileText,
     truck: Truck,

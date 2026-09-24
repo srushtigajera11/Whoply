@@ -1,87 +1,371 @@
 'use client';
 
-import { useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from 'react';
-import { motion, type Variants } from 'framer-motion';
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { AnimatePresence, motion, type Variants } from 'framer-motion';
 import {
     BarChart3,
     BellRing,
-    Bike,
     Boxes,
+    Check,
     CheckCheck,
-    Crown,
-    EyeOff,
     Lock,
-    Receipt,
-    ShoppingCart,
+    MessageCircle,
+    ReceiptIndianRupee,
     Truck,
     Users,
     Wallet,
-    Warehouse,
     type LucideIcon,
 } from 'lucide-react';
-import { getCopy, type Lang } from '@/i18n/landing';
+import { getCopy, HREF_LANG, type Lang } from '@/i18n/landing';
 import { cn } from '@/lib/cn';
 import { useReveal } from './Reveal';
-import { CountUp } from './Motion';
 
 /* Entrance: tiles rise and settle one after another. The 'hidden' step is
    instant (duration 0) — it only happens while the grid is still off-screen. */
-const grid: Variants = { hidden: {}, shown: { transition: { staggerChildren: 0.09 } } };
+const grid: Variants = { hidden: {}, shown: { transition: { staggerChildren: 0.08 } } };
 const tile: Variants = {
-    hidden: { opacity: 0, y: 80, scale: 0.92, transition: { duration: 0 } },
-    shown: { opacity: 1, y: 0, scale: 1, transition: { type: 'spring', stiffness: 110, damping: 18 } },
+    hidden: { opacity: 0, y: 60, scale: 0.95, transition: { duration: 0 } },
+    shown: { opacity: 1, y: 0, scale: 1, transition: { type: 'spring', stiffness: 120, damping: 18 } },
 };
 
-/** A bento tile with a cursor-following glow. */
-function Tile({ children, className, dark = false }: { children: ReactNode; className?: string; dark?: boolean }) {
-    const onMove = (e: PointerEvent<HTMLDivElement>) => {
-        const r = e.currentTarget.getBoundingClientRect();
-        e.currentTarget.style.setProperty('--mx', `${e.clientX - r.left}px`);
-        e.currentTarget.style.setProperty('--my', `${e.clientY - r.top}px`);
-    };
+const inr = (n: number) => `₹${n.toLocaleString('en-IN')}`;
+const d = (ms: number): CSSProperties => ({ animationDelay: `${ms}ms` });
+
+/** One glass tile: header up top, its micro-UI pinned to the bottom so every tile lines up. */
+function Tile({ Icon, title, body, children }: { Icon: LucideIcon; title: string; body: string; children: ReactNode }) {
     return (
         <motion.div
             variants={tile}
-            onPointerMove={onMove}
-            className={cn(
-                'spotlight relative flex flex-col overflow-hidden rounded-3xl border p-7 transition-shadow duration-300',
-                dark
-                    ? 'spotlight-dark border-white/10 bg-navy text-white hover:shadow-[0_30px_60px_-28px_rgb(15,43,70,0.7)]'
-                    : 'border-border bg-surface hover:shadow-[0_30px_60px_-30px_rgb(15,43,70,0.35)]',
-                className
-            )}
+            className="glow-border flex h-full flex-col rounded-3xl border border-slate-300/70 bg-white/75 p-6 shadow-md ring-1 ring-white/60 ring-inset backdrop-blur-md transition-[box-shadow,transform] duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-navy/10"
         >
-            {children}
+            <div className="flex items-start gap-3.5">
+                <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-accent-tint text-accent-strong">
+                    <Icon size={20} aria-hidden="true" />
+                </span>
+                <div className="min-w-0">
+                    <h3 className="font-display text-lg leading-snug font-bold text-navy">{title}</h3>
+                    <p className="mt-1 text-sm leading-relaxed text-muted">{body}</p>
+                </div>
+            </div>
+            <div className="mt-auto pt-6">{children}</div>
         </motion.div>
     );
 }
 
-function Head({ Icon, title, body, dark = false }: { Icon: LucideIcon; title: string; body: string; dark?: boolean }) {
+/* ── Micro-UI ─────────────────────────────────────────── */
+
+/** A bill writing itself, stamped GST-correct at the end (CSS loop). */
+function MiniBill({ lang }: { lang: Lang }) {
+    const m = getCopy(lang).hero.mock;
+    const items = m.bill.retailItems;
     return (
-        <div className="relative">
-            <div
-                className={cn(
-                    'grid h-11 w-11 place-items-center rounded-xl',
-                    dark ? 'bg-white/10 text-sand' : 'bg-accent-tint text-accent-strong'
-                )}
-            >
-                <Icon size={20} aria-hidden="true" />
+        <div className="relative rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm">
+            <ul className="space-y-1.5 text-xs">
+                {items.map(([name, qty, amt], i) => (
+                    <li key={name} className="bento-line flex justify-between gap-2" style={d(300 + i * 450)}>
+                        <span className="truncate">
+                            {name} <span className="text-muted">{qty}</span>
+                        </span>
+                        <span className="tabular">{inr(amt)}</span>
+                    </li>
+                ))}
+            </ul>
+            <div className="bento-line mt-2.5 flex items-center justify-between border-t border-dashed border-slate-300 pt-2" style={d(1700)}>
+                <span className="text-xs text-muted">{m.bill.total}</span>
+                <span className="tabular font-display text-lg font-extrabold text-navy">{inr(items.reduce((s, [, , a]) => s + a, 0))}</span>
             </div>
-            <h3 className={cn('mt-5 font-display text-xl font-bold', dark ? 'text-white' : 'text-navy')}>{title}</h3>
-            <p className={cn('mt-2 text-[0.95rem] leading-relaxed', dark ? 'text-white/70' : 'text-muted')}>{body}</p>
+            <span
+                className="bento-stamp absolute -top-3 -right-2 rounded-lg border-2 border-success bg-success-tint px-2 py-0.5 text-xs font-extrabold text-success"
+                style={d(2100)}
+            >
+                GST ✓
+            </span>
         </div>
     );
 }
 
-const d = (ms: number): CSSProperties => ({ animationDelay: `${ms}ms` });
+/** Stock levels draining and refilling, with the item that crossed its line called out. */
+function StockLevels({ lang }: { lang: Lang }) {
+    const m = getCopy(lang).hero.mock;
+    const stock: [string, number, number][] = [
+        [m.rows[0][0], 0.2, 5200],
+        [m.rows[1][0], 0.5, 7400],
+        [m.rows[2][0], 0.92, 6100],
+    ];
+    return (
+        <div>
+            <ul className="space-y-3">
+                {stock.map(([name, level, ms], k) => (
+                    <li key={name}>
+                        <p className="text-xs font-medium text-text">{name}</p>
+                        <div className="mt-1 h-2 overflow-hidden rounded-full bg-surface-2">
+                            <div
+                                className="bento-drain h-full origin-left rounded-full bg-success"
+                                style={{ width: `${level * 100}%`, animationDuration: `${ms}ms`, animationDelay: `-${(k * ms) / 3}ms` }}
+                            />
+                        </div>
+                    </li>
+                ))}
+            </ul>
+            <p className="mt-4 flex items-center gap-2 rounded-xl bg-danger-tint px-3 py-2 text-xs font-semibold text-danger">
+                <BellRing size={14} className="bento-ring shrink-0" aria-hidden="true" />
+                {m.rows[0][0]} · {m.rows[0][1]}
+            </p>
+        </div>
+    );
+}
+
+/** WhatsApp collection triggers: remind one customer, or everyone at once. */
+function UdharReminders({ lang }: { lang: Lang }) {
+    const ui = getCopy(lang).features.ui;
+    const people: [string, number, number][] = [
+        ['Ramesh Kirana', 12400, 3],
+        ['Sunita Patel', 8250, 2],
+        ['Mohan Lal', 3100, 1],
+    ];
+    const [sent, setSent] = useState<boolean[]>(people.map(() => false));
+    const all = sent.every(Boolean);
+
+    // Once everything has gone out, reset after a beat so the demo can be replayed.
+    useEffect(() => {
+        if (!all) return;
+        const id = setTimeout(() => setSent(people.map(() => false)), 4500);
+        return () => clearTimeout(id);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [all]);
+
+    const send = (i: number) => setSent((s) => s.map((v, k) => (k === i ? true : v)));
+
+    return (
+        <div>
+            <ul className="space-y-2">
+                {people.map(([name, amt, age], i) => (
+                    <li key={name} className="flex items-center gap-2.5 rounded-xl border border-slate-200/80 bg-white px-3 py-2">
+                        <span className="flex gap-0.5" aria-hidden="true">
+                            {[0, 1, 2].map((k) => (
+                                <span key={k} className={cn('h-1.5 w-1.5 rounded-full', k < age ? 'bg-danger' : 'bg-border')} />
+                            ))}
+                        </span>
+                        <span className="min-w-0 flex-1">
+                            <span className="block truncate text-xs font-semibold text-navy">{name}</span>
+                            <span className="tabular text-xs font-bold text-danger">{inr(amt)}</span>
+                        </span>
+                        <button
+                            type="button"
+                            onClick={() => send(i)}
+                            disabled={sent[i]}
+                            aria-label={`${ui.remind}: ${name}`}
+                            className={cn(
+                                'inline-flex h-8 min-w-[4.75rem] items-center justify-center gap-1 rounded-full px-2.5 text-[11px] font-bold transition-colors',
+                                sent[i] ? 'bg-success-tint text-success' : 'bg-[#128C7E] text-white hover:bg-[#0e7266]'
+                            )}
+                        >
+                            <AnimatePresence mode="wait" initial={false}>
+                                <motion.span
+                                    key={sent[i] ? 's' : 'r'}
+                                    initial={{ opacity: 0, scale: 0.6 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.6 }}
+                                    className="flex items-center gap-1"
+                                >
+                                    {sent[i] ? <CheckCheck size={13} aria-hidden="true" /> : <MessageCircle size={13} aria-hidden="true" />}
+                                    {sent[i] ? ui.sent : ui.remind}
+                                </motion.span>
+                            </AnimatePresence>
+                        </button>
+                    </li>
+                ))}
+            </ul>
+            <button
+                type="button"
+                onClick={() => setSent(people.map(() => true))}
+                disabled={all}
+                className={cn(
+                    'mt-3 flex w-full items-center justify-center gap-1.5 rounded-full border px-3 py-2 text-xs font-bold transition-colors',
+                    all ? 'border-success/30 bg-success-tint text-success' : 'border-[#25D366]/50 text-[#128C7E] hover:bg-[#25D366]/10'
+                )}
+            >
+                {all ? <CheckCheck size={14} aria-hidden="true" /> : <MessageCircle size={14} aria-hidden="true" />}
+                {all ? ui.allSent : ui.remindAll}
+            </button>
+        </div>
+    );
+}
+
+/** A truck running the dispatch route (CSS loop). */
+function DispatchRoute({ lang }: { lang: Lang }) {
+    const steps = getCopy(lang).wholesalers.timeline.slice(0, 4);
+    return (
+        <div>
+            <div className="relative h-8">
+                <div className="absolute inset-x-0 top-1/2 h-1 -translate-y-1/2 rounded-full bg-surface-2" />
+                <div className="bento-progress absolute inset-x-0 top-1/2 h-1 origin-left -translate-y-1/2 rounded-full bg-accent-bright" />
+                <div className="absolute inset-x-0 top-1/2 flex -translate-y-1/2 justify-between">
+                    {[0, 1, 2, 3].map((k) => (
+                        <span key={k} className="h-3 w-3 rounded-full border-2 border-accent-bright bg-surface" />
+                    ))}
+                </div>
+                <div className="bento-rail absolute inset-0">
+                    <span className="absolute top-1/2 left-0 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-full bg-navy text-white shadow-md">
+                        <Truck size={14} aria-hidden="true" />
+                    </span>
+                </div>
+            </div>
+            <div className="mt-2 grid grid-cols-4 gap-1 text-[11px] leading-tight text-muted">
+                {steps.map(([label], k) => (
+                    <span key={label} className={k === 0 ? 'text-left' : k === 3 ? 'text-right' : 'text-center'}>
+                        {label}
+                    </span>
+                ))}
+            </div>
+        </div>
+    );
+}
+
+/** Weekly sales where hovering, focusing or tapping a bar reads out that day. */
+function SalesChart({ lang }: { lang: Lang }) {
+    const ui = getCopy(lang).features.ui;
+    const sales = [21400, 28900, 24300, 36100, 31800, 42600, 48250];
+    const max = Math.max(...sales);
+    // 1 Jan 2024 was a Monday: seven days of localised weekday names.
+    const fmt = new Intl.DateTimeFormat(HREF_LANG[lang], { weekday: 'short' });
+    const days = sales.map((_, i) => fmt.format(new Date(2024, 0, 1 + i)));
+    const [on, setOn] = useState(sales.length - 1);
+
+    return (
+        <div>
+            <div className="flex items-end justify-between">
+                <div>
+                    <p className="text-[11px] text-muted">
+                        {ui.sales} · {days[on]}
+                    </p>
+                    <AnimatePresence mode="wait" initial={false}>
+                        <motion.p
+                            key={on}
+                            initial={{ opacity: 0, y: 6 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -6 }}
+                            transition={{ duration: 0.18 }}
+                            className="tabular font-display text-2xl font-extrabold text-navy"
+                        >
+                            {inr(sales[on])}
+                        </motion.p>
+                    </AnimatePresence>
+                </div>
+                <span className="text-[11px] text-muted">{ui.chartHint}</span>
+            </div>
+            <div className="mt-3 flex h-24 items-end gap-1.5" onPointerLeave={() => setOn(sales.length - 1)}>
+                {sales.map((v, i) => (
+                    <button
+                        key={i}
+                        type="button"
+                        aria-label={`${days[i]}: ${inr(v)}`}
+                        aria-pressed={on === i}
+                        onPointerEnter={() => setOn(i)}
+                        onFocus={() => setOn(i)}
+                        onClick={() => setOn(i)}
+                        className="group relative flex h-full flex-1 items-end"
+                    >
+                        <span
+                            className={cn(
+                                'w-full rounded-t-md transition-colors duration-200',
+                                on === i ? 'bg-accent' : 'bg-navy/15 group-hover:bg-navy/30'
+                            )}
+                            style={{ height: `${(v / max) * 100}%` }}
+                        />
+                    </button>
+                ))}
+            </div>
+            <div className="mt-1.5 flex gap-1.5">
+                {days.map((day, i) => (
+                    <span key={i} className={cn('flex-1 truncate text-center text-[10px]', on === i ? 'font-bold text-accent-strong' : 'text-muted')}>
+                        {day}
+                    </span>
+                ))}
+            </div>
+        </div>
+    );
+}
+
+/* Which permissions each role gets: billing, stock, reports, profit. */
+const ACCESS: boolean[][] = [
+    [true, true, true, true], // owner
+    [true, true, true, false], // manager
+    [true, false, false, false], // cashier
+    [false, true, false, false], // warehouse
+    [true, true, false, false], // sales
+];
+
+/** Pick a role; the permission badges flip to what that login can see. */
+function StaffPermissions({ lang }: { lang: Lang }) {
+    const ui = getCopy(lang).features.ui;
+    const [role, setRole] = useState(2);
+    return (
+        <div>
+            <p className="text-[11px] text-muted">{ui.seeAs}</p>
+            <div role="radiogroup" aria-label={ui.seeAs} className="mt-2 flex flex-wrap gap-1.5">
+                {ui.roles.map((r, i) => (
+                    <button
+                        key={r}
+                        type="button"
+                        role="radio"
+                        aria-checked={role === i}
+                        onClick={() => setRole(i)}
+                        className={cn(
+                            'relative rounded-full px-3 py-1.5 text-xs font-semibold transition-colors',
+                            role === i ? 'text-white' : 'bg-navy-tint text-navy hover:bg-navy/10'
+                        )}
+                    >
+                        {role === i && (
+                            <motion.span
+                                layoutId="bento-role"
+                                className="absolute inset-0 rounded-full bg-navy"
+                                transition={{ type: 'spring', stiffness: 500, damping: 36 }}
+                            />
+                        )}
+                        <span className="relative">{r}</span>
+                    </button>
+                ))}
+            </div>
+            <div className="mt-3 grid grid-cols-2 gap-2">
+                {ui.perms.map((p, k) => {
+                    const ok = ACCESS[role][k];
+                    return (
+                        <motion.div
+                            key={p}
+                            layout
+                            className={cn(
+                                'flex items-center gap-1.5 rounded-xl border px-2.5 py-2 text-xs font-semibold transition-colors duration-300',
+                                ok ? 'border-success/30 bg-success-tint text-success' : 'border-slate-200 bg-surface-2 text-muted'
+                            )}
+                        >
+                            <AnimatePresence mode="wait" initial={false}>
+                                <motion.span
+                                    key={ok ? 'y' : 'n'}
+                                    initial={{ rotate: -90, opacity: 0 }}
+                                    animate={{ rotate: 0, opacity: 1 }}
+                                    exit={{ rotate: 90, opacity: 0 }}
+                                    transition={{ duration: 0.18 }}
+                                >
+                                    {ok ? <Check size={13} aria-hidden="true" /> : <Lock size={13} aria-hidden="true" />}
+                                </motion.span>
+                            </AnimatePresence>
+                            <span className={cn('truncate', !ok && 'line-through decoration-muted/50')}>{p}</span>
+                        </motion.div>
+                    );
+                })}
+            </div>
+        </div>
+    );
+}
+
+/* ── Grid ─────────────────────────────────────────────── */
 
 export function Bento({ lang }: { lang: Lang }) {
-    const t = getCopy(lang);
-    const [c0, c1, c2, c3, c4, c5] = t.features.cards;
-    const m = t.hero.mock;
+    const [c0, c1, c2, c3, c4, c5] = getCopy(lang).features.cards;
     const [ref, state] = useReveal<HTMLDivElement>(0.1);
 
-    // Loops pause while the grid is off-screen — no work for animations nobody sees.
+    // CSS loops pause while the grid is off-screen — no work nobody sees.
     const [onScreen, setOnScreen] = useState(true);
     const box = useRef<HTMLDivElement>(null);
     useEffect(() => {
@@ -90,20 +374,6 @@ export function Bento({ lang }: { lang: Lang }) {
         return () => io.disconnect();
     }, []);
 
-    const stock: [string, number, number][] = [
-        [m.rows[0][0], 0.2, 5200],
-        [m.rows[1][0], 0.5, 7400],
-        [m.rows[2][0], 0.92, 6100],
-        ['Amul Butter 100g', 0.64, 8300],
-        ['Maggi 70g', 0.36, 9100],
-    ];
-    const udhar: [string, number][] = [
-        ['₹12,400', 3],
-        ['₹8,250', 2],
-        ['₹3,100', 1],
-    ];
-    const bars = [0.35, 0.5, 0.42, 0.66, 0.58, 0.8, 0.95];
-
     return (
         <div ref={box} className={cn('bento', !onScreen && 'bento-paused')}>
             <motion.div
@@ -111,206 +381,25 @@ export function Bento({ lang }: { lang: Lang }) {
                 variants={grid}
                 initial={false}
                 animate={state === 'hidden' ? 'hidden' : 'shown'}
-                className="mt-14 grid grid-flow-dense gap-5 md:grid-cols-2 lg:grid-cols-3"
+                className="mt-14 grid gap-5 sm:auto-rows-fr sm:grid-cols-2 lg:grid-cols-3"
             >
-                {/* ── Billing — the lead tile ───────────────── */}
-                <Tile dark className="md:col-span-2">
-                    <div className="grid h-full gap-8 sm:grid-cols-[1fr_15rem] sm:items-center">
-                        <Head dark Icon={Receipt} title={c0.title} body={c0.body} />
-                        <div className="relative mx-auto w-full max-w-[15rem] -rotate-2 rounded-2xl bg-white p-4 text-text shadow-[0_24px_50px_-20px_rgb(0,0,0,0.5)]">
-                            <p className="flex items-center gap-2 text-xs font-bold text-navy">
-                                <Receipt size={14} aria-hidden="true" /> {m.retailAction}
-                            </p>
-                            <ul className="mt-3 space-y-2 border-t border-dashed border-border pt-3 text-xs">
-                                {m.bill.retailItems.map(([name, qty, amt], i) => (
-                                    <li key={name} className="bento-line flex justify-between gap-2" style={d(300 + i * 450)}>
-                                        <span className="truncate">
-                                            {name} <span className="text-muted">{qty}</span>
-                                        </span>
-                                        <span className="tabular">₹{amt}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                            <div className="bento-line mt-3 flex items-center justify-between border-t border-border pt-2" style={d(1700)}>
-                                <span className="text-xs text-muted">{m.bill.total}</span>
-                                <span className="tabular font-display text-lg font-extrabold text-navy">
-                                    ₹{m.bill.retailItems.reduce((s, [, , a]) => s + a, 0)}
-                                </span>
-                            </div>
-                            <span
-                                className="bento-stamp absolute -top-3 -right-3 rounded-lg border-2 border-success bg-success-tint px-2 py-1 text-xs font-extrabold text-success"
-                                style={d(2100)}
-                            >
-                                GST ✓
-                            </span>
-                        </div>
-                    </div>
+                <Tile Icon={ReceiptIndianRupee} title={c0.title} body={c0.body}>
+                    <MiniBill lang={lang} />
                 </Tile>
-
-                {/* ── Stock — tall tile, levels draining and refilling ── */}
-                <Tile className="lg:row-span-2">
-                    <Head Icon={Boxes} title={c1.title} body={c1.body} />
-                    <ul className="mt-8 space-y-4">
-                        {stock.map(([name, level, ms], k) => (
-                            <li key={name}>
-                                <p className="text-xs font-medium text-text">{name}</p>
-                                <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-surface-2">
-                                    <div
-                                        className="bento-drain h-full origin-left rounded-full bg-success"
-                                        // Negative delay starts each bar mid-cycle so they never move in lockstep.
-                                        style={{
-                                            width: `${level * 100}%`,
-                                            animationDuration: `${ms}ms`,
-                                            animationDelay: `-${(k * ms) / stock.length}ms`,
-                                        }}
-                                    />
-                                </div>
-                            </li>
-                        ))}
-                    </ul>
-                    <div className="mt-auto pt-8">
-                        <div className="flex items-center gap-3 rounded-2xl bg-danger-tint px-4 py-3 text-danger">
-                            <BellRing size={18} className="bento-ring shrink-0" aria-hidden="true" />
-                            <p className="text-sm font-semibold">
-                                {m.rows[0][0]} · {m.rows[0][1]}
-                            </p>
-                        </div>
-                    </div>
+                <Tile Icon={Boxes} title={c1.title} body={c1.body}>
+                    <StockLevels lang={lang} />
                 </Tile>
-
-                {/* ── Udhar ─────────────────────────────────── */}
-                <Tile>
-                    <Head Icon={Wallet} title={c2.title} body={c2.body} />
-                    <div className="mt-6 rounded-2xl bg-surface-2 p-4">
-                        <p className="text-xs text-muted">{m.retailTiles[3][0]}</p>
-                        <p className="tabular font-display text-2xl font-extrabold text-danger">
-                            <CountUp value={m.retailTiles[3][1]} onView />
-                        </p>
-                        <ul className="mt-3 space-y-2">
-                            {udhar.map(([amt, age], i) => (
-                                <li key={amt} className="flex items-center gap-3 text-sm">
-                                    <span className="grid h-7 w-7 place-items-center rounded-full bg-navy-tint text-navy">
-                                        <Users size={13} aria-hidden="true" />
-                                    </span>
-                                    <span className="flex gap-1" aria-hidden="true">
-                                        {[0, 1, 2].map((k) => (
-                                            <span
-                                                key={k}
-                                                className={cn('h-1.5 w-1.5 rounded-full', k < age ? 'bg-danger' : 'bg-border')}
-                                            />
-                                        ))}
-                                    </span>
-                                    <span className="tabular ml-auto font-semibold text-navy">{amt}</span>
-                                    <span
-                                        className="bento-sent grid h-6 w-6 place-items-center rounded-full bg-[#25D366] text-white"
-                                        style={d(600 + i * 500)}
-                                    >
-                                        <CheckCheck size={12} aria-hidden="true" />
-                                    </span>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
+                <Tile Icon={Wallet} title={c2.title} body={c2.body}>
+                    <UdharReminders lang={lang} />
                 </Tile>
-
-                {/* ── Dispatch — a truck running the route ───── */}
-                <Tile>
-                    <Head Icon={Truck} title={c3.title} body={c3.body} />
-                    <div className="mt-auto pt-8">
-                        <div className="relative h-8">
-                            <div className="absolute inset-x-0 top-1/2 h-1 -translate-y-1/2 rounded-full bg-surface-2" />
-                            <div className="bento-progress absolute inset-x-0 top-1/2 h-1 origin-left -translate-y-1/2 rounded-full bg-accent-bright" />
-                            <div className="absolute inset-x-0 top-1/2 flex -translate-y-1/2 justify-between">
-                                {[0, 1, 2, 3].map((k) => (
-                                    <span key={k} className="h-3 w-3 rounded-full border-2 border-accent-bright bg-surface" />
-                                ))}
-                            </div>
-                            <div className="bento-rail absolute inset-0">
-                                <span className="absolute top-1/2 left-0 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-full bg-navy text-white shadow-md">
-                                    <Truck size={14} aria-hidden="true" />
-                                </span>
-                            </div>
-                        </div>
-                        <div className="mt-2 grid grid-cols-4 gap-1 text-[11px] leading-tight text-muted">
-                            {t.wholesalers.timeline.slice(0, 4).map(([label], k) => (
-                                <span key={label} className={k === 0 ? 'text-left' : k === 3 ? 'text-right' : 'text-center'}>
-                                    {label}
-                                </span>
-                            ))}
-                        </div>
-                    </div>
+                <Tile Icon={Truck} title={c3.title} body={c3.body}>
+                    <DispatchRoute lang={lang} />
                 </Tile>
-
-                {/* ── Reports — chart drawing itself ─────────── */}
-                <Tile className="md:col-span-2">
-                    <div className="grid h-full gap-8 sm:grid-cols-[1fr_1.1fr] sm:items-center">
-                        <div>
-                            <Head Icon={BarChart3} title={c4.title} body={c4.body} />
-                            <div className="mt-6 flex gap-8">
-                                {[m.retailTiles[0], m.retailTiles[2]].map(([label, value]) => (
-                                    <div key={label}>
-                                        <p className="text-xs text-muted">{label}</p>
-                                        <p className="tabular font-display text-2xl font-extrabold text-navy">
-                                            <CountUp value={value} onView />
-                                        </p>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                        <div className="relative h-44 rounded-2xl bg-surface-2 p-4">
-                            <div className="absolute inset-x-4 bottom-4 flex h-[70%] items-end gap-2">
-                                {bars.map((h, k) => (
-                                    <span
-                                        key={k}
-                                        className="bento-grow flex-1 origin-bottom rounded-t-md bg-navy/10"
-                                        style={{ height: `${h * 100}%`, ...d(k * 120) }}
-                                    />
-                                ))}
-                            </div>
-                            <svg viewBox="0 0 300 120" preserveAspectRatio="none" className="absolute inset-4 h-[calc(100%-2rem)] w-[calc(100%-2rem)]" aria-hidden="true">
-                                <path
-                                    className="bento-draw"
-                                    pathLength={1}
-                                    d="M0 100 L45 84 L90 90 L135 62 L180 70 L225 40 L270 46 L300 16"
-                                    fill="none"
-                                    stroke="var(--color-accent-bright)"
-                                    strokeWidth="3"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    vectorEffect="non-scaling-stroke"
-                                />
-                            </svg>
-                        </div>
-                    </div>
+                <Tile Icon={BarChart3} title={c4.title} body={c4.body}>
+                    <SalesChart lang={lang} />
                 </Tile>
-
-                {/* ── Staff — roles, and a profit they can't see ── */}
-                <Tile>
-                    <Head Icon={Users} title={c5.title} body={c5.body} />
-                    <div className="mt-auto pt-8">
-                        <div className="flex -space-x-2">
-                            {[Crown, ShoppingCart, Warehouse, Bike].map((Icon, k) => (
-                                <span
-                                    key={k}
-                                    className={cn(
-                                        'bento-pop grid h-11 w-11 place-items-center rounded-full border-2 border-surface',
-                                        k === 0 ? 'bg-accent text-white' : 'bg-navy-tint text-navy'
-                                    )}
-                                    style={d(k * 350)}
-                                >
-                                    <Icon size={17} aria-hidden="true" />
-                                </span>
-                            ))}
-                        </div>
-                        <div className="mt-4 flex items-center gap-3 rounded-2xl bg-surface-2 px-4 py-3">
-                            <Lock size={16} className="bento-ring shrink-0 text-navy" aria-hidden="true" />
-                            <span className="text-xs text-muted">{m.retailTiles[2][0]}</span>
-                            <span className="tabular ml-auto font-display font-extrabold text-navy blur-[5px] select-none" aria-hidden="true">
-                                {m.retailTiles[2][1]}
-                            </span>
-                            <EyeOff size={15} className="shrink-0 text-muted" aria-hidden="true" />
-                        </div>
-                    </div>
+                <Tile Icon={Users} title={c5.title} body={c5.body}>
+                    <StaffPermissions lang={lang} />
                 </Tile>
             </motion.div>
         </div>

@@ -19,7 +19,7 @@ import {
     Factory,
     FileCheck2,
     Languages,
-    Receipt,
+    ReceiptIndianRupee,
     ShieldCheck,
     Smartphone,
     Store,
@@ -47,6 +47,22 @@ function Words({ text, offset = 0 }: { text: string; offset?: number }) {
             </span>
         </Fragment>
     ));
+}
+
+/**
+ * Warm mesh behind the hero: three blurred blobs breathing on their own
+ * clocks (cream at the copy, slate behind the stage, orange between) and the
+ * dot grid fading out of the stage. Pure CSS, so it costs nothing to hydrate.
+ */
+function HeroBackdrop() {
+    return (
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+            <div className="mesh-blob mesh-a -top-[16%] -left-[14%] h-[72vw] w-[72vw] max-h-[720px] max-w-[720px] bg-[#ffedd5]" />
+            <div className="mesh-blob mesh-b top-[6%] -right-[16%] h-[64vw] w-[64vw] max-h-[680px] max-w-[680px] bg-[#1e293b]/20" />
+            <div className="mesh-blob mesh-c top-[36%] left-[32%] h-[46vw] w-[46vw] max-h-[480px] max-w-[480px] bg-accent/15" />
+            <div className="hero-dots absolute inset-0" />
+        </div>
+    );
 }
 
 export function Hero({ lang }: { lang: Lang }) {
@@ -79,7 +95,7 @@ export function Hero({ lang }: { lang: Lang }) {
                 onPointerLeave={onLeave}
                 className="hero-wash relative overflow-hidden"
             >
-                <div aria-hidden="true" className="hero-dots pointer-events-none absolute inset-0" />
+                <HeroBackdrop />
 
                 {/* No bottom padding: the stage stands on the marquee below. */}
                 <div className="wrap relative grid items-end gap-6 pt-12 md:pt-16 lg:grid-cols-2 lg:pt-10">
@@ -88,7 +104,7 @@ export function Hero({ lang }: { lang: Lang }) {
                         <div
                             role="tablist"
                             aria-label={t.hero.switchLabel}
-                            className="mx-auto mb-8 flex w-fit items-center gap-1 rounded-full border border-border bg-surface/80 p-1 shadow-[0_8px_24px_-12px_rgb(15,43,70,0.25)] backdrop-blur lg:mx-0"
+                            className="mx-auto mb-7 flex w-fit items-center gap-1 rounded-full border border-white/60 bg-white/70 p-1 shadow-[0_8px_24px_-12px_rgb(15,43,70,0.25)] backdrop-blur-md lg:mx-0"
                         >
                             {(
                                 [
@@ -121,13 +137,14 @@ export function Hero({ lang }: { lang: Lang }) {
                             ))}
                         </div>
 
-                        <span key={`e-${role}`} className="eyebrow fade-in">
+                        <span key={`e-${role}`} className="hero-badge fade-in">
+                            <span aria-hidden="true" className="hero-badge-dot" />
                             {c.eyebrow}
                         </span>
                         {/* Devanagari/Gujarati matras clip at tight leading — give them room. */}
                         <h1
                             key={`h-${role}`}
-                            className={`mt-4 font-display text-[2.5rem] font-extrabold text-navy sm:text-6xl lg:text-[3.5rem] xl:text-[4.1rem] 2xl:text-[4.5rem] ${
+                            className={`mt-5 font-display text-[2.5rem] font-extrabold text-navy sm:text-6xl lg:text-[3.5rem] xl:text-[4.1rem] 2xl:text-[4.5rem] ${
                                 lang === 'en' ? 'leading-[1.06]' : 'leading-[1.3]'
                             }`}
                         >
@@ -204,9 +221,13 @@ function Layer({
     children: ReactNode;
 }) {
     const reduce = useReducedMotion();
+    // Scroll drift only on mouse devices: on phones the stage is only seen
+    // after scrolling, so drift would pull the cards off their data lines.
+    const fine = useFinePointer();
+    const d = fine ? drift : 0;
     const { scrollY } = useScroll();
     const x = useTransform(px, (v) => v * depth);
-    const y = useTransform([py, scrollY], ([p, s]: number[]) => p * depth + (Math.min(s, 800) / 800) * drift);
+    const y = useTransform([py, scrollY], ([p, s]: number[]) => p * depth + (Math.min(s, 800) / 800) * d);
     return (
         <motion.div style={reduce ? undefined : { x, y }} className={className}>
             {children}
@@ -225,7 +246,9 @@ function Floater({ delay, bob, children }: { delay: number; bob: number; childre
     );
 }
 
-const FLOAT_SHADOW = 'shadow-[0_22px_48px_-20px_rgb(15,43,70,0.45)]';
+/* One glass treatment for every floating card. */
+const GLASS = 'border border-white/60 bg-white/80 shadow-xl shadow-navy/10 backdrop-blur-md';
+const GLASS_DARK = 'border border-white/20 bg-navy/90 shadow-xl shadow-navy/25 backdrop-blur-md';
 
 /**
  * The shopkeeper, standing in front of a navy dome, with the product floating
@@ -275,6 +298,10 @@ function HeroStage({
                 </svg>
             </Layer>
 
+            <Layer {...layer} depth={9} className="absolute inset-0">
+                <DataFlow />
+            </Layer>
+
             <Layer {...layer} depth={5} drift={30} className="absolute inset-0">
                 <Image
                     src={MEDIA.heroCutout.src}
@@ -287,9 +314,9 @@ function HeroStage({
             </Layer>
 
             {/* Money owed, reminder already out */}
-            <Layer {...layer} depth={16} drift={-45} className="absolute top-[12%] -left-1 z-10 sm:top-[17%] sm:-left-8">
+            <Layer {...layer} depth={16} drift={-45} className="absolute top-[5%] -right-4 z-10 sm:top-[17%] sm:right-auto sm:-left-8">
                 <Floater delay={400} bob={-1200}>
-                    <div className={cn('card w-[12.25rem] p-3.5 sm:w-[13.5rem]', FLOAT_SHADOW)}>
+                    <div className={cn('card', GLASS, 'w-[10.5rem] p-3 sm:w-[13.5rem] sm:p-3.5')}>
                         <div className="flex items-center gap-2.5">
                             <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-danger-tint text-danger">
                                 <Wallet size={17} aria-hidden="true" />
@@ -312,14 +339,14 @@ function HeroStage({
             {/* The bill being built — too wide for a phone stage */}
             <Layer {...layer} depth={22} drift={-70} className="absolute top-[3%] right-0 z-10 hidden sm:block lg:-right-6">
                 <Floater delay={600} bob={-3400}>
-                    <LiveBill key={role} lang={lang} role={role} className={cn('w-[15rem] rounded-2xl', FLOAT_SHADOW)} />
+                    <LiveBill key={role} lang={lang} role={role} className={'w-[15rem] rounded-2xl'} />
                 </Floater>
             </Layer>
 
             {/* Reorder alert */}
             <Layer {...layer} depth={26} drift={-35} className="absolute top-[60%] -left-1 z-10 sm:top-[58%] sm:-left-12">
                 <Floater delay={800} bob={-500}>
-                    <div className={cn('card flex items-center gap-3 py-2.5 pr-4 pl-2.5', FLOAT_SHADOW)}>
+                    <div className={cn('card', GLASS, 'flex items-center gap-3 py-2.5 pr-4 pl-2.5')}>
                         <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-warning-tint text-warning">
                             <BellRing size={16} aria-hidden="true" className="bento-ring" />
                         </span>
@@ -336,7 +363,7 @@ function HeroStage({
             {/* Compliance, done */}
             <Layer {...layer} depth={12} drift={-20} className="absolute right-0 bottom-[6%] z-10 sm:right-2">
                 <Floater delay={1000} bob={-2600}>
-                    <div className={cn('card flex items-center gap-2 !rounded-full py-2 pr-4 pl-2', FLOAT_SHADOW)}>
+                    <div className={cn('card', GLASS, 'flex items-center gap-2 !rounded-full py-2 pr-4 pl-2')}>
                         <span className="grid h-7 w-7 place-items-center rounded-full bg-success text-white">
                             <FileCheck2 size={14} aria-hidden="true" />
                         </span>
@@ -346,6 +373,69 @@ function HeroStage({
                 </Floater>
             </Layer>
         </div>
+    );
+}
+
+/* Where each stream goes, in stage percentages: tablet screen → card centre. */
+const STREAMS = [
+    { d: 'M 74 64 C 58 58, 40 40, 18 22', dur: 4.2, begin: 0, className: 'hidden sm:block' }, // udhar due (card on the left)
+    { d: 'M 76 62 C 88 52, 86 38, 81 29', dur: 4.2, begin: 0, className: 'sm:hidden' }, // udhar due on phones (card top-right)
+    { d: 'M 76 58 C 88 48, 92 34, 82 16', dur: 3.6, begin: 1.3, className: 'hidden sm:block' }, // bill (hidden with it)
+    { d: 'M 72 70 C 58 74, 40 76, 20 66', dur: 3.9, begin: 2.1 }, // reorder alert
+    { d: 'M 78 72 C 86 78, 88 86, 84 92', dur: 3.0, begin: 0.7 }, // compliance
+];
+
+/**
+ * Data streams from the tablet to the floating cards: a faint rail, a dashed
+ * run flowing along it, and a glowing dot riding it on a loop (SMIL — no JS
+ * per frame). Drawn in stage percentages so the lines land on the cards at
+ * every breakpoint; strokes and dots don't scale with the box.
+ */
+function DataFlow() {
+    return (
+        <svg
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+            aria-hidden="true"
+            className="flow-in absolute inset-0 h-full w-full overflow-visible"
+        >
+            <defs>
+                <linearGradient id="flow-grad" gradientUnits="userSpaceOnUse" x1="80" y1="66" x2="20" y2="30">
+                    <stop offset="0" stopColor="#ff8a3d" />
+                    <stop offset="1" stopColor="#c25000" stopOpacity="0.55" />
+                </linearGradient>
+            </defs>
+            {STREAMS.map((sfl, i) => (
+                <g key={i} className={sfl.className}>
+                    <path id={`flow-${i}`} d={sfl.d} className="flow-rail" />
+                    <path d={sfl.d} className="flow-dash" style={{ animationDelay: `${-sfl.begin}s` }} />
+                    {/* A hair-length round-capped stroke draws as a perfect dot even under
+                        preserveAspectRatio="none" (a lone moveto would draw nothing). */}
+                    {(['flow-dot flow-dot-halo', 'flow-dot'] as const).map((cls) => (
+                        <path key={cls} d="M0 0 h0.01" className={cls}>
+                            <animateMotion
+                                dur={`${sfl.dur}s`}
+                                begin={`${sfl.begin}s`}
+                                repeatCount="indefinite"
+                                calcMode="spline"
+                                keyTimes="0;1"
+                                keySplines="0.4 0 0.6 1"
+                            >
+                                <mpath href={`#flow-${i}`} />
+                            </animateMotion>
+                            <animate
+                                attributeName="opacity"
+                                values="0;1;1;0"
+                                keyTimes="0;0.12;0.85;1"
+                                dur={`${sfl.dur}s`}
+                                begin={`${sfl.begin}s`}
+                                repeatCount="indefinite"
+                            />
+                        </path>
+                    ))}
+                </g>
+            ))}
+        </svg>
     );
 }
 
@@ -380,9 +470,9 @@ function LiveBill({ lang, role, className }: { lang: Lang; role: Role; className
     const total = shown.reduce((s, [, , amt]) => s + amt, 0);
 
     return (
-        <div ref={ref} className={cn('flex flex-col rounded-xl bg-navy p-4 text-white', className)}>
+        <div ref={ref} className={cn('flex flex-col rounded-xl p-4 text-white', GLASS_DARK, className)}>
             <p className="flex items-center gap-2 text-sm font-semibold">
-                <Receipt size={16} aria-hidden="true" />
+                <ReceiptIndianRupee size={16} aria-hidden="true" />
                 {role === 'retail' ? m.retailAction : m.wholesaleAction}
             </p>
 
@@ -395,10 +485,10 @@ function LiveBill({ lang, role, className }: { lang: Lang; role: Role; className
                             initial={{ opacity: 0, y: 6 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, transition: { duration: 0.15 } }}
-                            className="flex items-center justify-between gap-2 text-white/80"
+                            className="flex items-center justify-between gap-2 text-white/90"
                         >
                             <span className="truncate">
-                                {name} <span className="text-white/50">{qty}</span>
+                                {name} <span className="text-white/65">{qty}</span>
                             </span>
                             <span className="tabular shrink-0">₹{amt.toLocaleString('en-IN')}</span>
                         </motion.li>
@@ -406,8 +496,8 @@ function LiveBill({ lang, role, className }: { lang: Lang; role: Role; className
                 </AnimatePresence>
             </ul>
 
-            <div className="mt-2 flex items-center justify-between border-t border-white/15 pt-2">
-                <span className="text-xs text-white/60">{m.bill.total}</span>
+            <div className="mt-2 flex items-center justify-between border-t border-white/20 pt-2">
+                <span className="text-xs text-white/75">{m.bill.total}</span>
                 <span className="tabular font-display text-lg font-extrabold">
                     <CountUp value={`₹${total}`} />
                 </span>

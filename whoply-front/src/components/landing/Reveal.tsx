@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { cn } from '@/lib/cn';
 
 /**
@@ -64,11 +64,14 @@ export function Reveal({
     delay = 0,
     variant = 'up',
     className,
+    style: outerStyle,
 }: {
     children: ReactNode;
     delay?: number;
     variant?: Variant;
     className?: string;
+    /** Layout styles for the outer element, e.g. a grid-row span. */
+    style?: CSSProperties;
 }) {
     const [ref, state] = useReveal<HTMLDivElement>();
 
@@ -84,7 +87,7 @@ export function Reveal({
     // would never fire — watch an unclipped wrapper and clip the inner layer.
     if (variant === 'wipe') {
         return (
-            <div ref={ref} className={className}>
+            <div ref={ref} className={className} style={outerStyle}>
                 <div className={motionClass} style={style}>
                     {children}
                 </div>
@@ -93,7 +96,7 @@ export function Reveal({
     }
 
     return (
-        <div ref={ref} className={cn(motionClass, className)} style={style}>
+        <div ref={ref} className={cn(motionClass, className)} style={{ ...outerStyle, ...style }}>
             {children}
         </div>
     );

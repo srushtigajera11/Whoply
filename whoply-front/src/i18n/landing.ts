@@ -68,8 +68,45 @@ export interface LandingCopy {
         };
     };
     marquee: { label: string; items: string[] };
-    problem: { eyebrow: string; title: string; cards: { title: string; body: string }[] };
-    compliance: { eyebrow: string; title: string; sub: string; cards: { title: string; body: string }[]; quote: string };
+    problem: {
+        eyebrow: string;
+        title: string;
+        cards: { title: string; body: string }[];
+        /** Paper register vs Whoply, row by row. */
+        compare: {
+            paper: string;
+            paperSub: string;
+            app: string;
+            appSub: string;
+            vs: string;
+            rows: { topic: string; paper: string; paperTag: string; app: string; appTag: string }[];
+            /** Live status on each Whoply row, same order as `rows`. */
+            live: string[];
+            liveLabel: string;
+            autoSent: string;
+            /** Label on the phone connector from the paper card to the Whoply card. */
+            flow: string;
+            /** Scribbled next to struck-out udhar lines in the register. */
+            paperNote: string;
+        };
+    };
+    compliance: {
+        eyebrow: string;
+        title: string;
+        sub: string;
+        cards: { title: string; body: string }[];
+        quote: string;
+        /** Labels inside the auto-filing pipeline nodes. */
+        pipe: {
+            irn: string;
+            cleared: string;
+            vehicle: string;
+            taxable: string;
+            exportBtn: string;
+            exporting: string;
+            sent: string;
+        };
+    };
     shopkeepers: {
         eyebrow: string;
         title: string;
@@ -79,6 +116,35 @@ export interface LandingCopy {
         stats: [string, string][];
         /** Hotspots on the counter-kit photo — only hardware the app really supports. */
         kit: { label: string; hint: string; items: { title: string; body: string }[] };
+        /** The retail feature tabs: the eight bullets grouped into four. */
+        groups: { title: string; body: string }[];
+        /** Micro-UI inside the four counter metric cards. */
+        metrics: {
+            avg: string;
+            batch: (n: number, exp: string) => string;
+            due: (amount: string) => string;
+            reminded: string;
+            send: string;
+            sent: string;
+        };
+        /** Labels inside the per-feature phone mockups. */
+        mock: {
+            tabsLabel: string;
+            pay: [string, string, string];
+            batch: string;
+            expiresIn: (days: number) => string;
+            days: (days: number) => string;
+            quote: string;
+            invoice: string;
+            convert: string;
+            creditNote: string;
+            returned: string;
+            damaged: string;
+            po: string;
+            received: string;
+            pending: string;
+            youOwe: string;
+        };
     };
     wholesalers: {
         eyebrow: string;
@@ -88,8 +154,60 @@ export interface LandingCopy {
         cta: string;
         timelineLabel: string;
         timeline: [string, string][];
+        /** Labels inside the per-feature mockups. */
+        mock: {
+            tabsLabel: string;
+            tier: string;
+            auto: string;
+            newOrders: string;
+            phone: string;
+            counter: string;
+            generated: string;
+            limit: string;
+            onHold: string;
+            collected: string;
+            visits: string;
+            orders: string;
+            commission: string;
+            pick: string;
+            pack: string;
+            onShelf: string;
+        };
+        /** The four-stage distribution pipeline that replaces the bullet tabs. */
+        stages: { title: string; sub: string; body: string }[];
+        pipe: {
+            dealer: string;
+            applied: (tier: string, price: string) => string;
+            order: string;
+            ewb: string;
+            driver: string;
+            out: string;
+            agent: (name: string) => string;
+            visited: (n: number) => string;
+            collected: (amount: string) => string;
+            outstanding: string;
+            available: string;
+            ok: string;
+            hold: string;
+        };
     };
-    features: { eyebrow: string; title: string; cards: { title: string; body: string }[] };
+    features: {
+        eyebrow: string;
+        title: string;
+        cards: { title: string; body: string }[];
+        /** Micro-UI inside the bento tiles. */
+        ui: {
+            remind: string;
+            sent: string;
+            remindAll: string;
+            allSent: string;
+            roles: string[];
+            perms: string[];
+            seeAs: string;
+            chartHint: string;
+            sales: string;
+        };
+    };
     reorder: { eyebrow: string; title: string; body: string; foot: string; rows: [string, string, string][] };
     staff: { title: string; body: string; note: string };
     automation: { title: string; items: { when: string; what: string }[] };
@@ -108,8 +226,20 @@ export interface LandingCopy {
         choose: (name: string) => string;
         planFor: Record<string, string>;
         foot: string;
+        monthly: string;
+        yearly: string;
+        save: string;
+        billedYearly: (amount: string) => string;
     };
-    faq: { eyebrow: string; title: string; qa: [string, string][] };
+    faq: {
+        eyebrow: string;
+        title: string;
+        qa: [string, string][];
+        /** Filter tabs: all, hardware & offline, tax & staff, data & onboarding. */
+        cats: [string, string, string, string];
+        /** Proof badges shown inside specific open answers. */
+        proof: { devices: string; export: string; offline: string };
+    };
     finalCta: { eyebrow: string; title: string; sub: string; button: string; foot: string };
     contact: { whatsapp: string; whatsappMsg: string };
     footer: {
@@ -242,6 +372,48 @@ const en: LandingCopy = {
                 body: 'You know today’s sales. You don’t know today’s profit. Whoply does — before you shut the shutter.',
             },
         ],
+        compare: {
+            paper: 'Paper register',
+            paperSub: 'What most counters still run on',
+            app: 'Whoply digital ledger',
+            appSub: 'The same shop, on your phone',
+            vs: 'vs',
+            rows: [
+                {
+                    topic: 'Udhar',
+                    paper: 'A name in a diary, six months old. Nobody reminds anyone.',
+                    paperTag: 'Forgotten',
+                    app: 'Every customer’s ledger with aging. Reminders go out on WhatsApp at 10 AM.',
+                    appTag: 'Auto-reminded',
+                },
+                {
+                    topic: 'Expiry',
+                    paper: 'Cartons at the back, past date — straight to loss.',
+                    paperTag: 'Expired',
+                    app: 'Batch-wise tracking warns you before the date.',
+                    appTag: 'Alert 7 days early',
+                },
+                {
+                    topic: 'Billing',
+                    paper: 'Wrong GST rate, wrong total, an argument at the counter.',
+                    paperTag: 'Disputed',
+                    app: 'GST calculated and printed right, every time.',
+                    appTag: 'GST-correct',
+                },
+                {
+                    topic: 'Profit',
+                    paper: 'You know today’s sales. Profit is a guess till month-end.',
+                    paperTag: 'Guessed',
+                    app: 'Real profit before you shut the shutter.',
+                    appTag: 'Live tonight',
+                },
+            ],
+            live: ['+ ₹500 collected', 'Alert sent · 7 days left', 'Bill sent on WhatsApp', 'Profit ₹6,420 today'],
+            liveLabel: 'Live',
+            autoSent: 'WhatsApp auto-sent',
+            flow: 'Now the same shop, on Whoply',
+            paperNote: 'paid??',
+        },
     },
     compliance: {
         eyebrow: 'Compliance',
@@ -266,6 +438,15 @@ const en: LandingCopy = {
             },
         ],
         quote: '“Your CA gets his file. You never open a laptop.”',
+        pipe: {
+            irn: 'IRN generated',
+            cleared: 'Auto-cleared',
+            vehicle: 'Vehicle',
+            taxable: 'Taxable value',
+            exportBtn: '1-click Tally export',
+            exporting: 'Exporting…',
+            sent: 'Sent to CA',
+        },
     },
     shopkeepers: {
         eyebrow: 'For shopkeepers',
@@ -298,6 +479,37 @@ const en: LandingCopy = {
                 { title: 'UPI QR', body: 'Shows your UPI QR with the bill amount already filled in. The customer just scans and pays.' },
             ],
         },
+        groups: [
+            { title: 'GST billing', body: 'Bill in seconds with GST built in, turn quotes into invoices, and handle returns properly.' },
+            { title: 'Stock & expiry alerts', body: 'Batch-wise expiry warnings, and reorder quantities worked out from what really sells.' },
+            { title: 'Udhar & collections', body: 'Every rupee of credit with aging, WhatsApp reminders, and tonight’s profit in one tap.' },
+            { title: 'Suppliers & purchases', body: 'Purchase orders, goods receipt, and exactly what you still owe each supplier.' },
+        ],
+        metrics: {
+            avg: '8 sec average',
+            batch: (n, e) => `Batch #${n} • Exp ${e}`,
+            due: (a) => `${a} due`,
+            reminded: 'Auto-reminded',
+            send: 'Send day-close summary',
+            sent: 'Summary sent',
+        },
+        mock: {
+            tabsLabel: 'Retail features',
+            pay: ['Cash', 'UPI', 'Card'],
+            batch: 'Batch',
+            expiresIn: (d) => `Expires in ${d} days`,
+            days: (d) => `${d} days`,
+            quote: 'Quotation',
+            invoice: 'Invoice',
+            convert: 'Converted to invoice',
+            creditNote: 'Credit note',
+            returned: 'Returned',
+            damaged: 'Damaged',
+            po: 'Purchase order',
+            received: 'Received',
+            pending: 'Pending',
+            youOwe: 'You owe suppliers',
+        },
     },
     wholesalers: {
         eyebrow: 'For wholesalers',
@@ -307,7 +519,7 @@ const en: LandingCopy = {
             'Dealer-wise price tiers — Retailer A ₹95, B ₹92, C ₹90. Applied automatically.',
             'Bulk orders, none missed — WhatsApp, phone or counter into one list.',
             'Dispatch to delivery, tracked — shipped? received? delayed? paid?',
-            'E-way bill and e-invoice raised from the order screen as goods leave.',
+            'E-way bill & e-invoice — raised from the order screen as goods leave.',
             'Outstanding by dealer — with credit limits enforced before the next order.',
             'Collect on the route — your rep records payment against the dealer on the spot.',
             'Know where your team went — visits logged, orders collected, commission calculated.',
@@ -322,6 +534,61 @@ const en: LandingCopy = {
             ['Delivered', 'Awaiting confirmation'],
             ['Payment', '₹84,200 outstanding'],
         ],
+        mock: {
+            tabsLabel: 'Distribution features',
+            tier: 'Retailer',
+            auto: 'Applied automatically',
+            newOrders: 'New orders',
+            phone: 'Phone',
+            counter: 'Counter',
+            generated: 'Generated',
+            limit: 'Limit',
+            onHold: 'Over limit — next order on hold',
+            collected: 'Collected on route',
+            visits: 'Visits',
+            orders: 'Orders',
+            commission: 'Commission',
+            pick: 'Pick',
+            pack: 'Pack',
+            onShelf: 'On shelf',
+        },
+        stages: [
+            {
+                title: 'Dealer price tiers',
+                sub: 'Rate slabs per retailer type',
+                body: 'Every dealer sits in a tier. Pick the dealer and the right rate goes on the order by itself — no rate card, no mistakes.',
+            },
+            {
+                title: 'Bulk orders & dispatch',
+                sub: 'Packing list and e-way bill in one go',
+                body: 'Orders from WhatsApp, phone or counter land in one list. The packing list, e-way bill and e-invoice are raised as the goods leave.',
+            },
+            {
+                title: 'Route & collection',
+                sub: 'Field agents, tracked',
+                body: 'Your agent logs every visit and records payment against the dealer on the spot. You see what came in before they’re back.',
+            },
+            {
+                title: 'Outstanding credit matrix',
+                sub: 'Dealer-wise ledger and limits',
+                body: 'Outstanding by dealer, with credit limits enforced before the next order goes through.',
+            },
+        ],
+        pipe: {
+            dealer: 'Dealer',
+            applied: (tier, price) => `${tier}: ${price} applied automatically`,
+            order: 'Order',
+            ewb: 'E-way bill generated',
+            driver: 'Driver assigned',
+            out: 'Out for delivery',
+            agent: (n) => `Agent ${n}`,
+            visited: (n) => `${n} stores visited`,
+            collected: (a) => `${a} collected today`,
+            outstanding: 'Outstanding',
+            available: 'Available',
+            ok: 'Within limit',
+            hold: 'On hold',
+        },
     },
     features: {
         eyebrow: 'Everything included',
@@ -352,6 +619,17 @@ const en: LandingCopy = {
                 body: 'Owner, manager, cashier, warehouse, sales staff — separate logins, separate views.',
             },
         ],
+        ui: {
+            remind: 'Remind',
+            sent: 'Sent',
+            remindAll: 'Remind all on WhatsApp',
+            allSent: 'All reminders sent',
+            roles: ['Owner', 'Manager', 'Cashier', 'Warehouse', 'Sales'],
+            perms: ['Billing', 'Stock', 'Reports', 'Profit'],
+            seeAs: 'See the app as',
+            chartHint: 'Tap a bar',
+            sales: 'Sales',
+        },
     },
     reorder: {
         eyebrow: 'Reorder engine',
@@ -420,7 +698,7 @@ const en: LandingCopy = {
         sub: 'Start free. Move up when your business does.',
         anchor: 'One udhar entry you forgot to collect costs more than a year of Pro.',
         per: 'month',
-        popular: 'Most popular',
+        popular: 'Most popular for shops',
         startFree: 'Start free',
         choose: (name) => `Choose ${name}`,
         planFor: {
@@ -429,10 +707,20 @@ const en: LandingCopy = {
             business: 'Wholesalers & multi-shop',
         },
         foot: 'Your data is yours. Export it any time, on any plan — including Free.',
+        monthly: 'Monthly',
+        yearly: 'Yearly',
+        save: 'Save 20%',
+        billedYearly: (a) => `${a} billed yearly`,
     },
     faq: {
         eyebrow: 'FAQ',
         title: 'Questions shop owners ask us',
+        cats: ['All questions', 'Hardware & offline', 'Tax & staff access', 'Data & onboarding'],
+        proof: {
+            devices: 'Android phone & tablet · No laptop needed',
+            export: 'GSTR-ready reports · 1-click Tally export',
+            offline: 'Opens without signal · Offline billing coming soon',
+        },
         qa: [
             [
                 'Do I need a computer?',
@@ -479,7 +767,7 @@ const en: LandingCopy = {
             {
                 head: 'Product',
                 links: [
-                    ['Features', '#features'],
+                    ['Features', '#shopkeepers'],
                     ['Pricing', '#pricing'],
                     ['Install the app', '#install'],
                 ],
@@ -630,6 +918,48 @@ const hi: LandingCopy = {
                 body: 'आज की बिक्री आपको पता है। आज का मुनाफ़ा नहीं। Whoply को पता है — शटर गिराने से पहले।',
             },
         ],
+        compare: {
+            paper: 'कागज़ी रजिस्टर',
+            paperSub: 'जिस पर ज़्यादातर काउंटर आज भी चलते हैं',
+            app: 'Whoply डिजिटल खाता',
+            appSub: 'वही दुकान, आपके फ़ोन पर',
+            vs: 'बनाम',
+            rows: [
+                {
+                    topic: 'उधार',
+                    paper: 'डायरी में छह महीने पुराना एक नाम। कोई याद नहीं दिलाता।',
+                    paperTag: 'भूला हुआ',
+                    app: 'हर ग्राहक का खाता, पुराने बकाये के साथ। सुबह 10 बजे WhatsApp पर रिमाइंडर।',
+                    appTag: 'अपने आप रिमाइंडर',
+                },
+                {
+                    topic: 'एक्सपायरी',
+                    paper: 'पीछे रखे कार्टन, तारीख निकल गई — सीधा नुकसान।',
+                    paperTag: 'एक्सपायर',
+                    app: 'बैच-वार ट्रैकिंग, तारीख से पहले चेतावनी।',
+                    appTag: '7 दिन पहले अलर्ट',
+                },
+                {
+                    topic: 'बिलिंग',
+                    paper: 'गलत GST दर, गलत टोटल, काउंटर पर बहस।',
+                    paperTag: 'विवाद',
+                    app: 'GST की सही गणना, हर बार सही प्रिंट।',
+                    appTag: 'GST सही',
+                },
+                {
+                    topic: 'मुनाफ़ा',
+                    paper: 'आज की बिक्री पता है, मुनाफ़ा महीने के अंत तक अंदाज़ा।',
+                    paperTag: 'अंदाज़ा',
+                    app: 'शटर गिराने से पहले असली मुनाफ़ा।',
+                    appTag: 'आज रात ही',
+                },
+            ],
+            live: ['+ ₹500 वसूल', 'अलर्ट भेजा · 7 दिन बाकी', 'बिल WhatsApp पर भेजा', 'आज का मुनाफ़ा ₹6,420'],
+            liveLabel: 'लाइव',
+            autoSent: 'WhatsApp अपने आप भेजा',
+            flow: 'अब वही दुकान, Whoply पर',
+            paperNote: 'मिला??',
+        },
     },
     compliance: {
         eyebrow: 'कम्प्लायंस',
@@ -654,6 +984,15 @@ const hi: LandingCopy = {
             },
         ],
         quote: '“आपके CA को उनकी फ़ाइल मिल जाती है। आपको लैपटॉप खोलना ही नहीं पड़ता।”',
+        pipe: {
+            irn: 'IRN बन गया',
+            cleared: 'अपने आप क्लियर',
+            vehicle: 'गाड़ी',
+            taxable: 'कर योग्य राशि',
+            exportBtn: '1-क्लिक Tally export',
+            exporting: 'भेजा जा रहा है…',
+            sent: 'CA को भेजा',
+        },
     },
     shopkeepers: {
         eyebrow: 'दुकानदारों के लिए',
@@ -686,6 +1025,37 @@ const hi: LandingCopy = {
                 { title: 'UPI QR', body: 'बिल की रकम भरा हुआ आपका UPI QR दिखता है। ग्राहक बस स्कैन करके पेमेंट करे।' },
             ],
         },
+        groups: [
+            { title: 'GST बिलिंग', body: 'GST के साथ सेकंडों में बिल, कोटेशन से इनवॉइस, और रिटर्न का सही हिसाब।' },
+            { title: 'स्टॉक और एक्सपायरी अलर्ट', body: 'बैच-वार एक्सपायरी चेतावनी, और असली बिक्री से तय होने वाली रीऑर्डर मात्रा।' },
+            { title: 'उधार और वसूली', body: 'हर रुपये का उधार पुराने बकाये के साथ, WhatsApp रिमाइंडर, और एक टैप में आज का मुनाफ़ा।' },
+            { title: 'सप्लायर और खरीद', body: 'खरीद ऑर्डर, माल की रसीद, और हर सप्लायर का कितना बाकी है।' },
+        ],
+        metrics: {
+            avg: 'औसत 8 सेकंड',
+            batch: (n, e) => `बैच #${n} • एक्सपायरी ${e}`,
+            due: (a) => `${a} बाकी`,
+            reminded: 'अपने आप रिमाइंडर',
+            send: 'डे-क्लोज़ सारांश भेजें',
+            sent: 'सारांश भेजा गया',
+        },
+        mock: {
+            tabsLabel: 'रिटेल फ़ीचर',
+            pay: ['नकद', 'UPI', 'कार्ड'],
+            batch: 'बैच',
+            expiresIn: (d) => `${d} दिन में एक्सपायर`,
+            days: (d) => `${d} दिन`,
+            quote: 'कोटेशन',
+            invoice: 'इनवॉइस',
+            convert: 'इनवॉइस बन गया',
+            creditNote: 'क्रेडिट नोट',
+            returned: 'वापसी',
+            damaged: 'टूट-फूट',
+            po: 'खरीद ऑर्डर',
+            received: 'मिल गया',
+            pending: 'बाकी',
+            youOwe: 'सप्लायरों का बकाया',
+        },
     },
     wholesalers: {
         eyebrow: 'थोक विक्रेताओं के लिए',
@@ -695,7 +1065,7 @@ const hi: LandingCopy = {
             'डीलर-वार कीमत — रिटेलर A ₹95, B ₹92, C ₹90। हर बार अपने आप लागू।',
             'बल्क ऑर्डर, एक भी न छूटे — WhatsApp, फ़ोन या काउंटर, सब एक लिस्ट में।',
             'डिस्पैच से डिलीवरी तक ट्रैकिंग — भेजा? पहुँचा? देरी? भुगतान हुआ?',
-            'माल निकलते ही ऑर्डर स्क्रीन से e-way bill और e-invoice।',
+            'e-way bill और e-invoice — माल निकलते ही ऑर्डर स्क्रीन से।',
             'डीलर-वार बकाया — अगले ऑर्डर से पहले क्रेडिट लिमिट लागू।',
             'रूट पर ही वसूली — आपका रेप मौके पर डीलर के नाम भुगतान दर्ज करे।',
             'टीम कहाँ गई, पता रहे — विज़िट दर्ज, ऑर्डर लिए गए, कमीशन की गिनती।',
@@ -710,6 +1080,61 @@ const hi: LandingCopy = {
             ['डिलीवर', 'पुष्टि बाकी'],
             ['भुगतान', '₹84,200 बकाया'],
         ],
+        mock: {
+            tabsLabel: 'वितरण फ़ीचर',
+            tier: 'रिटेलर',
+            auto: 'अपने आप लागू',
+            newOrders: 'नए ऑर्डर',
+            phone: 'फ़ोन',
+            counter: 'काउंटर',
+            generated: 'बन गया',
+            limit: 'लिमिट',
+            onHold: 'लिमिट पार — अगला ऑर्डर रुका',
+            collected: 'रूट पर वसूली',
+            visits: 'विज़िट',
+            orders: 'ऑर्डर',
+            commission: 'कमीशन',
+            pick: 'पिक',
+            pack: 'पैक',
+            onShelf: 'शेल्फ़ पर',
+        },
+        stages: [
+            {
+                title: 'डीलर प्राइस टियर',
+                sub: 'रिटेलर के प्रकार के हिसाब से रेट',
+                body: 'हर डीलर एक टियर में है। डीलर चुनिए, सही रेट ऑर्डर पर अपने आप लग जाता है — न रेट कार्ड, न गलती।',
+            },
+            {
+                title: 'बल्क ऑर्डर और डिस्पैच',
+                sub: 'पैकिंग लिस्ट और e-way bill एक साथ',
+                body: 'WhatsApp, फ़ोन या काउंटर के ऑर्डर एक लिस्ट में। माल निकलते ही पैकिंग लिस्ट, e-way bill और e-invoice तैयार।',
+            },
+            {
+                title: 'रूट और वसूली',
+                sub: 'फ़ील्ड एजेंट की पूरी ट्रैकिंग',
+                body: 'आपका एजेंट हर विज़िट दर्ज करता है और मौके पर डीलर के नाम भुगतान लिखता है। उसके लौटने से पहले आपको वसूली दिख जाती है।',
+            },
+            {
+                title: 'बकाया क्रेडिट मैट्रिक्स',
+                sub: 'डीलर-वार खाता और लिमिट',
+                body: 'डीलर-वार बकाया, और अगले ऑर्डर से पहले क्रेडिट लिमिट लागू।',
+            },
+        ],
+        pipe: {
+            dealer: 'डीलर',
+            applied: (tier, price) => `${tier}: ${price} अपने आप लागू`,
+            order: 'ऑर्डर',
+            ewb: 'e-way bill बना',
+            driver: 'ड्राइवर तय',
+            out: 'डिलीवरी के लिए निकला',
+            agent: (n) => `एजेंट ${n}`,
+            visited: (n) => `${n} दुकानों पर विज़िट`,
+            collected: (a) => `आज ${a} वसूल`,
+            outstanding: 'बकाया',
+            available: 'उपलब्ध',
+            ok: 'लिमिट में',
+            hold: 'रुका हुआ',
+        },
     },
     features: {
         eyebrow: 'सब कुछ शामिल',
@@ -740,6 +1165,17 @@ const hi: LandingCopy = {
                 body: 'मालिक, मैनेजर, कैशियर, गोदाम, सेल्स स्टाफ़ — अलग लॉगिन, अलग नज़र।',
             },
         ],
+        ui: {
+            remind: 'याद दिलाएँ',
+            sent: 'भेजा',
+            remindAll: 'सबको WhatsApp पर याद दिलाएँ',
+            allSent: 'सारे रिमाइंडर भेजे गए',
+            roles: ['मालिक', 'मैनेजर', 'कैशियर', 'गोदाम', 'सेल्स'],
+            perms: ['बिलिंग', 'स्टॉक', 'रिपोर्ट', 'मुनाफ़ा'],
+            seeAs: 'ऐप ऐसे देखें',
+            chartHint: 'किसी बार पर टैप करें',
+            sales: 'बिक्री',
+        },
     },
     reorder: {
         eyebrow: 'रीऑर्डर इंजन',
@@ -808,7 +1244,7 @@ const hi: LandingCopy = {
         sub: 'मुफ़्त शुरू करें। व्यापार बढ़े तो आगे बढ़ें।',
         anchor: 'एक भूला हुआ उधार, Pro के पूरे साल से ज़्यादा महँगा पड़ता है।',
         per: 'महीना',
-        popular: 'सबसे लोकप्रिय',
+        popular: 'दुकानों की पहली पसंद',
         startFree: 'मुफ़्त शुरू करें',
         choose: (name) => `${name} चुनें`,
         planFor: {
@@ -817,10 +1253,20 @@ const hi: LandingCopy = {
             business: 'थोक और कई दुकानें',
         },
         foot: 'आपका डेटा आपका है। किसी भी प्लान पर — मुफ़्त वाले पर भी — कभी भी एक्सपोर्ट करें।',
+        monthly: 'मासिक',
+        yearly: 'सालाना',
+        save: '20% बचाएँ',
+        billedYearly: (a) => `सालाना ${a} का बिल`,
     },
     faq: {
         eyebrow: 'सवाल-जवाब',
         title: 'दुकानदार हमसे यह पूछते हैं',
+        cats: ['सभी सवाल', 'हार्डवेयर और ऑफ़लाइन', 'टैक्स और स्टाफ़ एक्सेस', 'डेटा और शुरुआत'],
+        proof: {
+            devices: 'Android फ़ोन और टैबलेट · लैपटॉप ज़रूरी नहीं',
+            export: 'GSTR-रेडी रिपोर्ट · 1-क्लिक Tally export',
+            offline: 'बिना सिग्नल खुलता है · ऑफ़लाइन बिलिंग जल्द',
+        },
         qa: [
             [
                 'क्या कंप्यूटर चाहिए?',
@@ -867,7 +1313,7 @@ const hi: LandingCopy = {
             {
                 head: 'प्रोडक्ट',
                 links: [
-                    ['फ़ीचर', '#features'],
+                    ['फ़ीचर', '#shopkeepers'],
                     ['कीमत', '#pricing'],
                     ['ऐप इंस्टॉल करें', '#install'],
                 ],
@@ -1018,6 +1464,48 @@ const gu: LandingCopy = {
                 body: 'આજનું વેચાણ તમને ખબર છે. આજનો નફો નહીં. Whoply ને ખબર છે — શટર પાડતાં પહેલાં.',
             },
         ],
+        compare: {
+            paper: 'કાગળનું રજિસ્ટર',
+            paperSub: 'જેના પર મોટાભાગના કાઉન્ટર હજુ ચાલે છે',
+            app: 'Whoply ડિજિટલ ખાતું',
+            appSub: 'એ જ દુકાન, તમારા ફોન પર',
+            vs: 'સામે',
+            rows: [
+                {
+                    topic: 'ઉધાર',
+                    paper: 'ડાયરીમાં છ મહિના જૂનું એક નામ. કોઈ યાદ નથી કરાવતું.',
+                    paperTag: 'ભૂલાયેલું',
+                    app: 'દરેક ગ્રાહકનું ખાતું, જૂના બાકી સાથે. સવારે 10 વાગ્યે WhatsApp પર રિમાઇન્ડર.',
+                    appTag: 'આપોઆપ રિમાઇન્ડર',
+                },
+                {
+                    topic: 'એક્સપાયરી',
+                    paper: 'પાછળ પડેલાં ખોખાં, તારીખ વીતી ગઈ — સીધું નુકસાન.',
+                    paperTag: 'એક્સપાયર',
+                    app: 'બેચ પ્રમાણે ટ્રેકિંગ, તારીખ પહેલાં ચેતવણી.',
+                    appTag: '7 દિવસ પહેલાં એલર્ટ',
+                },
+                {
+                    topic: 'બિલિંગ',
+                    paper: 'ખોટો GST દર, ખોટો ટોટલ, કાઉન્ટર પર રકઝક.',
+                    paperTag: 'વિવાદ',
+                    app: 'GSTની સાચી ગણતરી, દર વખતે સાચી પ્રિન્ટ.',
+                    appTag: 'GST સાચો',
+                },
+                {
+                    topic: 'નફો',
+                    paper: 'આજનું વેચાણ ખબર છે, નફો મહિનાના અંત સુધી અંદાજ.',
+                    paperTag: 'અંદાજ',
+                    app: 'શટર પાડતાં પહેલાં સાચો નફો.',
+                    appTag: 'આજે રાત્રે જ',
+                },
+            ],
+            live: ['+ ₹500 વસૂલ', 'એલર્ટ મોકલ્યું · 7 દિવસ બાકી', 'બિલ WhatsApp પર મોકલ્યું', 'આજનો નફો ₹6,420'],
+            liveLabel: 'લાઇવ',
+            autoSent: 'WhatsApp આપોઆપ મોકલ્યું',
+            flow: 'હવે એ જ દુકાન, Whoply પર',
+            paperNote: 'મળ્યા??',
+        },
     },
     compliance: {
         eyebrow: 'કમ્પ્લાયન્સ',
@@ -1042,6 +1530,15 @@ const gu: LandingCopy = {
             },
         ],
         quote: '“તમારા CA ને એમની ફાઇલ મળી જાય છે. તમારે લેપટોપ ખોલવું જ પડતું નથી.”',
+        pipe: {
+            irn: 'IRN બની ગયું',
+            cleared: 'આપોઆપ ક્લિયર',
+            vehicle: 'વાહન',
+            taxable: 'કરપાત્ર રકમ',
+            exportBtn: '1-ક્લિક Tally export',
+            exporting: 'મોકલાય છે…',
+            sent: 'CAને મોકલ્યું',
+        },
     },
     shopkeepers: {
         eyebrow: 'દુકાનદારો માટે',
@@ -1074,6 +1571,37 @@ const gu: LandingCopy = {
                 { title: 'UPI QR', body: 'બિલની રકમ ભરેલો તમારો UPI QR દેખાય છે. ગ્રાહક બસ સ્કેન કરીને ચૂકવે.' },
             ],
         },
+        groups: [
+            { title: 'GST બિલિંગ', body: 'GST સાથે સેકન્ડોમાં બિલ, ક્વોટેશનથી ઇન્વૉઇસ, અને રિટર્નનો સાચો હિસાબ.' },
+            { title: 'સ્ટોક અને એક્સપાયરી એલર્ટ', body: 'બેચ પ્રમાણે એક્સપાયરી ચેતવણી, અને સાચા વેચાણ પરથી નક્કી થતો રીઓર્ડર જથ્થો.' },
+            { title: 'ઉધાર અને વસૂલાત', body: 'દરેક રૂપિયાનું ઉધાર જૂના બાકી સાથે, WhatsApp રિમાઇન્ડર, અને એક ટૅપમાં આજનો નફો.' },
+            { title: 'સપ્લાયર અને ખરીદી', body: 'ખરીદ ઓર્ડર, માલની રસીદ, અને દરેક સપ્લાયરનું કેટલું બાકી છે.' },
+        ],
+        metrics: {
+            avg: 'સરેરાશ 8 સેકન્ડ',
+            batch: (n, e) => `બેચ #${n} • એક્સપાયરી ${e}`,
+            due: (a) => `${a} બાકી`,
+            reminded: 'આપોઆપ રિમાઇન્ડર',
+            send: 'ડે-ક્લોઝ સારાંશ મોકલો',
+            sent: 'સારાંશ મોકલાયો',
+        },
+        mock: {
+            tabsLabel: 'રિટેલ ફીચર',
+            pay: ['રોકડ', 'UPI', 'કાર્ડ'],
+            batch: 'બેચ',
+            expiresIn: (d) => `${d} દિવસમાં એક્સપાયર`,
+            days: (d) => `${d} દિવસ`,
+            quote: 'ક્વોટેશન',
+            invoice: 'ઇન્વૉઇસ',
+            convert: 'ઇન્વૉઇસ બની ગયું',
+            creditNote: 'ક્રેડિટ નોટ',
+            returned: 'પરત',
+            damaged: 'તૂટફૂટ',
+            po: 'ખરીદ ઓર્ડર',
+            received: 'મળી ગયું',
+            pending: 'બાકી',
+            youOwe: 'સપ્લાયરોનું બાકી',
+        },
     },
     wholesalers: {
         eyebrow: 'જથ્થાબંધ વેપારીઓ માટે',
@@ -1083,7 +1611,7 @@ const gu: LandingCopy = {
             'ડીલર પ્રમાણે ભાવ — રિટેલર A ₹95, B ₹92, C ₹90. દર વખતે આપોઆપ લાગુ.',
             'જથ્થાબંધ ઓર્ડર, એક પણ છૂટે નહીં — WhatsApp, ફોન કે કાઉન્ટર, બધું એક યાદીમાં.',
             'ડિસ્પેચથી ડિલિવરી સુધી ટ્રેકિંગ — મોકલાયું? પહોંચ્યું? મોડું? ચુકવણી થઈ?',
-            'માલ નીકળે કે તરત ઓર્ડર સ્ક્રીનથી e-way bill અને e-invoice.',
+            'e-way bill અને e-invoice — માલ નીકળે કે તરત ઓર્ડર સ્ક્રીનથી.',
             'ડીલર પ્રમાણે બાકી — આગલા ઓર્ડર પહેલાં ક્રેડિટ લિમિટ લાગુ.',
             'રૂટ પર જ વસૂલાત — તમારો રેપ જગ્યા પર જ ડીલરના નામે ચુકવણી નોંધે.',
             'ટીમ ક્યાં ગઈ એની ખબર રહે — વિઝિટ નોંધાય, ઓર્ડર લેવાયા, કમિશનની ગણતરી.',
@@ -1098,6 +1626,61 @@ const gu: LandingCopy = {
             ['ડિલિવર', 'પુષ્ટિ બાકી'],
             ['ચુકવણી', '₹84,200 બાકી'],
         ],
+        mock: {
+            tabsLabel: 'વિતરણ ફીચર',
+            tier: 'રિટેલર',
+            auto: 'આપોઆપ લાગુ',
+            newOrders: 'નવા ઓર્ડર',
+            phone: 'ફોન',
+            counter: 'કાઉન્ટર',
+            generated: 'બની ગયું',
+            limit: 'લિમિટ',
+            onHold: 'લિમિટ પાર — આગલો ઓર્ડર અટક્યો',
+            collected: 'રૂટ પર વસૂલાત',
+            visits: 'વિઝિટ',
+            orders: 'ઓર્ડર',
+            commission: 'કમિશન',
+            pick: 'પિક',
+            pack: 'પેક',
+            onShelf: 'શેલ્ફ પર',
+        },
+        stages: [
+            {
+                title: 'ડીલર પ્રાઇસ ટિયર',
+                sub: 'રિટેલરના પ્રકાર પ્રમાણે ભાવ',
+                body: 'દરેક ડીલર એક ટિયરમાં છે. ડીલર પસંદ કરો, સાચો ભાવ ઓર્ડર પર આપોઆપ લાગે છે — ન રેટ કાર્ડ, ન ભૂલ.',
+            },
+            {
+                title: 'જથ્થાબંધ ઓર્ડર અને ડિસ્પેચ',
+                sub: 'પેકિંગ લિસ્ટ અને e-way bill એકસાથે',
+                body: 'WhatsApp, ફોન કે કાઉન્ટરના ઓર્ડર એક યાદીમાં. માલ નીકળે કે તરત પેકિંગ લિસ્ટ, e-way bill અને e-invoice તૈયાર.',
+            },
+            {
+                title: 'રૂટ અને વસૂલાત',
+                sub: 'ફીલ્ડ એજન્ટનું પૂરું ટ્રેકિંગ',
+                body: 'તમારો એજન્ટ દરેક વિઝિટ નોંધે છે અને જગ્યા પર જ ડીલરના નામે ચુકવણી લખે છે. એ પાછો આવે એ પહેલાં વસૂલાત દેખાય છે.',
+            },
+            {
+                title: 'બાકી ક્રેડિટ મેટ્રિક્સ',
+                sub: 'ડીલર પ્રમાણે ખાતું અને લિમિટ',
+                body: 'ડીલર પ્રમાણે બાકી, અને આગલા ઓર્ડર પહેલાં ક્રેડિટ લિમિટ લાગુ.',
+            },
+        ],
+        pipe: {
+            dealer: 'ડીલર',
+            applied: (tier, price) => `${tier}: ${price} આપોઆપ લાગુ`,
+            order: 'ઓર્ડર',
+            ewb: 'e-way bill બન્યું',
+            driver: 'ડ્રાઇવર નક્કી',
+            out: 'ડિલિવરી માટે નીકળ્યો',
+            agent: (n) => `એજન્ટ ${n}`,
+            visited: (n) => `${n} દુકાનોની વિઝિટ`,
+            collected: (a) => `આજે ${a} વસૂલ`,
+            outstanding: 'બાકી',
+            available: 'ઉપલબ્ધ',
+            ok: 'લિમિટમાં',
+            hold: 'અટકેલું',
+        },
     },
     features: {
         eyebrow: 'બધું સામેલ',
@@ -1128,6 +1711,17 @@ const gu: LandingCopy = {
                 body: 'માલિક, મેનેજર, કેશિયર, ગોદામ, સેલ્સ સ્ટાફ — અલગ લોગિન, અલગ નજર.',
             },
         ],
+        ui: {
+            remind: 'યાદ કરાવો',
+            sent: 'મોકલ્યું',
+            remindAll: 'બધાને WhatsApp પર યાદ કરાવો',
+            allSent: 'બધા રિમાઇન્ડર મોકલાયા',
+            roles: ['માલિક', 'મેનેજર', 'કેશિયર', 'ગોદામ', 'સેલ્સ'],
+            perms: ['બિલિંગ', 'સ્ટોક', 'રિપોર્ટ', 'નફો'],
+            seeAs: 'એપ આ રીતે જુઓ',
+            chartHint: 'કોઈ બાર પર ટૅપ કરો',
+            sales: 'વેચાણ',
+        },
     },
     reorder: {
         eyebrow: 'રીઓર્ડર એન્જિન',
@@ -1196,7 +1790,7 @@ const gu: LandingCopy = {
         sub: 'મફત શરૂ કરો. ધંધો વધે તો આગળ વધો.',
         anchor: 'એક ભૂલાઈ ગયેલું ઉધાર, Pro ના આખા વર્ષ કરતાં મોંઘું પડે છે.',
         per: 'મહિનો',
-        popular: 'સૌથી લોકપ્રિય',
+        popular: 'દુકાનોની પહેલી પસંદ',
         startFree: 'મફત શરૂ કરો',
         choose: (name) => `${name} પસંદ કરો`,
         planFor: {
@@ -1205,10 +1799,20 @@ const gu: LandingCopy = {
             business: 'જથ્થાબંધ અને અનેક દુકાનો',
         },
         foot: 'તમારો ડેટા તમારો છે. કોઈ પણ પ્લાન પર — મફત વાળા પર પણ — ગમે ત્યારે એક્સપોર્ટ કરો.',
+        monthly: 'માસિક',
+        yearly: 'વાર્ષિક',
+        save: '20% બચાવો',
+        billedYearly: (a) => `વાર્ષિક ${a}નું બિલ`,
     },
     faq: {
         eyebrow: 'પ્રશ્નો',
         title: 'દુકાનદારો અમને આ પૂછે છે',
+        cats: ['બધા પ્રશ્નો', 'હાર્ડવેર અને ઑફલાઇન', 'ટેક્સ અને સ્ટાફ ઍક્સેસ', 'ડેટા અને શરૂઆત'],
+        proof: {
+            devices: 'Android ફોન અને ટેબ્લેટ · લેપટોપ જરૂરી નથી',
+            export: 'GSTR-રેડી રિપોર્ટ · 1-ક્લિક Tally export',
+            offline: 'સિગ્નલ વગર ખૂલે છે · ઑફલાઇન બિલિંગ ટૂંક સમયમાં',
+        },
         qa: [
             [
                 'શું કમ્પ્યુટર જોઈએ?',
@@ -1255,7 +1859,7 @@ const gu: LandingCopy = {
             {
                 head: 'પ્રોડક્ટ',
                 links: [
-                    ['ફીચર', '#features'],
+                    ['ફીચર', '#shopkeepers'],
                     ['કિંમત', '#pricing'],
                     ['એપ ઇન્સ્ટોલ કરો', '#install'],
                 ],

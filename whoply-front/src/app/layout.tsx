@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter, Manrope, Noto_Sans_Devanagari, Noto_Sans_Gujarati } from 'next/font/google';
+import { Inter, Kalam, Manrope, Noto_Sans_Devanagari, Noto_Sans_Gujarati } from 'next/font/google';
 import './globals.css';
 
 const inter = Inter({
@@ -38,6 +38,15 @@ const gujarati = Noto_Sans_Gujarati({
     preload: false,
 });
 
+/** Handwriting for the paper-register side of the comparison (Latin + Devanagari). */
+const hand = Kalam({
+    subsets: ['latin', 'devanagari'],
+    weight: ['400', '700'],
+    variable: '--font-kalam',
+    display: 'swap',
+    preload: false,
+});
+
 const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://whoply.in';
 
 /**
@@ -64,7 +73,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     return (
         <html
             lang="en"
-            className={`${inter.variable} ${manrope.variable} ${devanagari.variable} ${gujarati.variable}`}
+            className={`${inter.variable} ${manrope.variable} ${devanagari.variable} ${gujarati.variable} ${hand.variable}`}
         >
             <body>{children}</body>
         </html>

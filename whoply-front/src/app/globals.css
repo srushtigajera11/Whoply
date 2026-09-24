@@ -44,6 +44,7 @@
     --font-sans:
         var(--font-inter), var(--font-devanagari), var(--font-gujarati), ui-sans-serif, system-ui,
         -apple-system, "Segoe UI", sans-serif;
+    --font-hand: var(--font-kalam), var(--font-devanagari), var(--font-gujarati), cursive;
     --font-display:
         var(--font-manrope), var(--font-inter), var(--font-devanagari), var(--font-gujarati),
         ui-sans-serif, system-ui, sans-serif;
@@ -190,6 +191,22 @@
     40% { transform: translate(-9%, 5%) scale(1.1); }
     70% { transform: translate(6%, -7%) scale(0.92); }
 }
+/* Hero mesh: each blob breathes on its own clock; the base gradient's angle
+   swings a few degrees so the whole wash feels alive without ever jumping. */
+@keyframes mesh-pulse {
+    0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.9; }
+    35% { transform: translate(5%, -6%) scale(1.12); opacity: 1; }
+    70% { transform: translate(-4%, 5%) scale(0.94); opacity: 0.72; }
+}
+@keyframes mesh-angle {
+    0%, 100% { --mesh-angle: 104deg; }
+    50% { --mesh-angle: 116deg; }
+}
+@property --mesh-angle { syntax: "<angle>"; inherits: false; initial-value: 104deg; }
+/* Data-stream dashes travelling from the tablet to the metric cards. */
+@keyframes flow-dash {
+    to { stroke-dashoffset: -14; }
+}
 @keyframes border-spin {
     to { --ring-angle: 360deg; }
 }
@@ -321,8 +338,14 @@
         color: var(--color-navy);
         border-color: var(--color-navy);
     }
+    .btn-secondary {
+        transition: background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease,
+            transform 0.18s ease, box-shadow 0.22s ease;
+    }
     .btn-secondary:hover {
-        background: var(--color-surface-2);
+        background: var(--color-surface);
+        border-color: var(--color-navy-light);
+        box-shadow: 0 0 0 4px rgb(15 43 70 / 0.1), 0 12px 28px -16px rgb(15 43 70 / 0.55);
     }
 
     .btn-on-navy {
@@ -575,11 +598,241 @@
         }
     }
 
-    /* Soft radial wash behind the hero — built, not borrowed. */
+    /* Animated accent border for cards. A conic gradient travels round the
+       edge (masked to a 1.5px ring); hidden at rest, shown on hover/focus or
+       when the card carries .is-active. The card's own border stays visible
+       underneath, so boxes are always separable. */
+    .glow-border {
+        position: relative;
+        isolation: isolate;
+    }
+    .glow-border::before {
+        content: "";
+        position: absolute;
+        inset: -1px;
+        z-index: 1;
+        border-radius: inherit;
+        padding: 1.5px;
+        background: conic-gradient(
+            from var(--ring-angle),
+            transparent 0%,
+            transparent 55%,
+            var(--color-accent-bright) 72%,
+            var(--color-sand) 84%,
+            transparent 100%
+        );
+        -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+        -webkit-mask-composite: xor;
+        mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+        opacity: 0;
+        transition: opacity 0.35s ease;
+        animation: border-spin 4.5s linear infinite;
+        pointer-events: none;
+    }
+    .glow-border:hover::before,
+    .glow-border:focus-within::before,
+    .glow-border.is-active::before {
+        opacity: 1;
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .glow-border::before { animation: none; }
+    }
+
+    /* A cream register page: fibre grain (SVG noise), blue rules every 28px,
+       and a red margin line. The torn bottom edge is an SVG in the component. */
+    .paper-sheet {
+        background-color: #fbf6ea;
+        background-image:
+            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.45 0 0 0 0 0.35 0 0 0 0 0.2 0 0 0 0.09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+            linear-gradient(90deg, transparent 2.35rem, rgb(180 35 24 / 0.35) 2.35rem, rgb(180 35 24 / 0.35) calc(2.35rem + 1.5px), transparent calc(2.35rem + 1.5px)),
+            repeating-linear-gradient(180deg, transparent 0 27px, rgb(59 130 246 / 0.13) 27px 28px),
+            radial-gradient(120% 80% at 50% 0%, #fffaf0 0%, #f6eedb 100%);
+    }
+    @media (min-width: 640px) {
+        .paper-sheet {
+            background-image:
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.45 0 0 0 0 0.35 0 0 0 0 0.2 0 0 0 0.09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+                linear-gradient(90deg, transparent 2.85rem, rgb(180 35 24 / 0.35) 2.85rem, rgb(180 35 24 / 0.35) calc(2.85rem + 1.5px), transparent calc(2.85rem + 1.5px)),
+                repeating-linear-gradient(180deg, transparent 0 27px, rgb(59 130 246 / 0.13) 27px 28px),
+                radial-gradient(120% 80% at 50% 0%, #fffaf0 0%, #f6eedb 100%);
+        }
+    }
+    /* Faint glowing grid inside the Whoply ledger, strongest at the top right. */
+    .ledger-mesh {
+        background-image:
+            linear-gradient(rgb(255 255 255 / 0.06) 1px, transparent 1px),
+            linear-gradient(90deg, rgb(255 255 255 / 0.06) 1px, transparent 1px);
+        background-size: 32px 32px;
+        -webkit-mask-image: radial-gradient(ellipse 80% 60% at 80% 10%, #000 10%, transparent 70%);
+        mask-image: radial-gradient(ellipse 80% 60% at 80% 10%, #000 10%, transparent 70%);
+    }
+    /* Compliance pipeline connector: dashes flowing down (phone) or right (lg). */
+    .pipe-dash {
+        background-image: linear-gradient(180deg, rgb(148 163 184 / 0.5) 50%, transparent 50%);
+        background-size: 2px 10px;
+        animation: pipe-flow-y 0.8s linear infinite;
+    }
+    @media (min-width: 1024px) {
+        .pipe-dash {
+            background-image: linear-gradient(90deg, rgb(148 163 184 / 0.5) 50%, transparent 50%);
+            background-size: 10px 2px;
+            animation-name: pipe-flow-x;
+        }
+    }
+    .pipe-dash-fast { animation-duration: 0.35s; }
+    @keyframes pipe-flow-y { to { background-position: 0 10px; } }
+    @keyframes pipe-flow-x { to { background-position: 10px 0; } }
+    @media (prefers-reduced-motion: reduce) {
+        .pipe-dash { animation: none; }
+    }
+
+    /* Retail section: a soft multi-stop wash whose position drifts, so the
+       colour slowly flows across the section. */
+    .retail-aurora {
+        background: linear-gradient(120deg, #fff7ed 0%, #ffedd5 25%, #eef2f6 50%, #ffedd5 75%, #fff7ed 100%);
+        background-size: 300% 300%;
+        animation: retail-flow 22s ease-in-out infinite;
+    }
+    @keyframes retail-flow {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .retail-aurora { animation: none; }
+    }
+
+    /* FAQ backdrop: a faint navy dot grid, strongest around the questions. */
+    .faq-dots {
+        background-image: radial-gradient(rgb(15 43 70 / 0.16) 1px, transparent 1.4px);
+        background-size: 20px 20px;
+        -webkit-mask-image: radial-gradient(ellipse 70% 75% at 50% 50%, #000 30%, transparent 85%);
+        mask-image: radial-gradient(ellipse 70% 75% at 50% 50%, #000 30%, transparent 85%);
+    }
+
+    /* Fine navy dot texture over the light "Get started" aurora, fading to the edges. */
+    .get-started-dots {
+        background-image: radial-gradient(rgb(15 43 70 / 0.12) 1px, transparent 1.3px);
+        background-size: 22px 22px;
+        -webkit-mask-image: radial-gradient(ellipse 75% 65% at 50% 35%, #000 25%, transparent 78%);
+        mask-image: radial-gradient(ellipse 75% 65% at 50% 35%, #000 25%, transparent 78%);
+    }
+
+    /* Link from a counter device to its metric card, dashes flowing to the card. */
+    .kit-beam {
+        stroke: var(--color-accent-bright);
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-dasharray: 5 6;
+        animation: kit-beam-flow 0.9s linear infinite;
+    }
+    @keyframes kit-beam-flow {
+        to { stroke-dashoffset: -11; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .kit-beam { animation: none; }
+    }
+
+    /* Dashed connector on the phone story, flowing downwards. */
+    .story-dash {
+        stroke: var(--color-accent-bright);
+        stroke-width: 2.5;
+        stroke-linecap: round;
+        stroke-dasharray: 2 7;
+        animation: story-flow 1.2s linear infinite;
+    }
+    @keyframes story-flow {
+        to { stroke-dashoffset: -9; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .story-dash { animation: none; }
+    }
+
+    /* ── Hero: Digital Commerce Flow ──────────────────── */
+    /* Warm cream where the copy sits, a slate/navy undertone behind the stage,
+       and a gradient angle that drifts a few degrees over half a minute. */
     .hero-wash {
+        --mesh-angle: 104deg;
         background:
-            radial-gradient(760px 460px at 50% -12%, rgb(217 200 176 / 0.55), transparent 68%),
-            radial-gradient(620px 420px at 88% 4%, rgb(194 80 0 / 0.09), transparent 62%),
-            radial-gradient(680px 460px at 8% 12%, rgb(15 43 70 / 0.07), transparent 62%);
+            radial-gradient(880px 560px at 10% 8%, #fff7ed 0%, transparent 62%),
+            radial-gradient(760px 620px at 98% 34%, rgb(15 23 42 / 0.16), transparent 62%),
+            radial-gradient(620px 420px at 58% 102%, rgb(255 237 213 / 0.85), transparent 60%),
+            linear-gradient(var(--mesh-angle), #fff7ed 0%, #ffedd5 36%, #f3eeea 62%, #e2e7ef 100%);
+        animation: mesh-angle 30s ease-in-out infinite;
+    }
+    /* Blurred colour blobs that breathe behind the hero. Lighter blur on
+       phones — a big blurred layer is the costliest thing on a budget GPU. */
+    .mesh-blob {
+        position: absolute;
+        border-radius: 9999px;
+        filter: blur(44px);
+        will-change: transform, opacity;
+    }
+    @media (min-width: 768px) {
+        .mesh-blob { filter: blur(72px); }
+    }
+    .mesh-a { animation: mesh-pulse 18s ease-in-out infinite; }
+    .mesh-b { animation: mesh-pulse 24s ease-in-out -8s infinite; }
+    .mesh-c { animation: mesh-pulse 21s ease-in-out -14s infinite; }
+
+    /* "Built for Bharat's shops" as a glass pill. */
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.4rem 0.9rem;
+        border-radius: 999px;
+        border: 1px solid rgb(194 80 0 / 0.18);
+        background: rgb(255 255 255 / 0.72);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        box-shadow: 0 8px 22px -14px rgb(15 43 70 / 0.35);
+        font-size: 0.6875rem;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--color-accent-strong);
+    }
+    .hero-badge-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 999px;
+        background: var(--color-accent);
+        box-shadow: 0 0 0 3px rgb(194 80 0 / 0.16);
+    }
+
+    /* Data streams: a faint rail under a brighter dashed run that flows
+       towards each card; the dots ride the same paths (SMIL, see Hero.tsx). */
+    .flow-rail {
+        fill: none;
+        stroke: var(--color-navy);
+        stroke-opacity: 0.26;
+        stroke-width: 1.25;
+        vector-effect: non-scaling-stroke;
+    }
+    .flow-dash {
+        fill: none;
+        stroke: url(#flow-grad);
+        stroke-width: 2.25;
+        stroke-linecap: round;
+        stroke-dasharray: 2.2 4.8;
+        vector-effect: non-scaling-stroke;
+        animation: flow-dash 3.2s linear infinite;
+    }
+    .flow-dot {
+        fill: none;
+        stroke: var(--color-accent-bright);
+        stroke-linecap: round;
+        stroke-width: 6;
+        vector-effect: non-scaling-stroke;
+    }
+    .flow-dot-halo {
+        stroke: rgb(255 138 61 / 0.35);
+        stroke-width: 16;
+    }
+    .flow-in { animation: fade-in 1.4s ease 0.9s both; }
+
+    @media (prefers-reduced-motion: reduce) {
+        .hero-wash, .mesh-a, .mesh-b, .mesh-c, .flow-dash { animation: none; }
+        .flow-dot, .flow-dot-halo { display: none; }
     }
 }
